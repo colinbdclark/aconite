@@ -162,26 +162,53 @@
         return info;
     };
 
-    aconite.animator = function (callback) {
-        var raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+    fluid.defaults("aconite.animator", {
+        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
-        var that = {
-            cancelled: false
+        model: {
+            active: true
+        },
+
+        members: {
+            raf: window.requestAnimationFrame || window.webkitRequestAnimationFrame
+        },
+
+        invokers: {
+            start: {
+                func: "{that}.applier.change",
+                args: ["active", true]
+            },
+
+            stop: {
+                func: "{that}.applier.change",
+                args: ["active", false]
+            }
+        },
+
+        events: {
+            onTick: null,
+            onNextFrame: null
+        },
+
+        listeners: {
+            onTick: {
+                funcName: "flock.animator.tick",
+                args: ["{that}.model", "{that}.events.onNextFrame"]
+            },
+
+            onNextFrame: [
+                {
+                    func: "{that}.raf({that}.events.onTick.fire)",
+                    priority: "last"
+                }
+            ]
+        }
+    });
+
+    aconite.animator.tick = function (m, onNextFrame) {
+        if (m.active) {
+            onNextFrame();
         };
-
-        that.ticker = function () {
-            if (!that.cancelled) {
-                callback();
-                raf(that.ticker);
-            };
-        };
-
-        that.cancel = function () {
-            that.cancelled = true;
-        };
-
-        that.ticker();
-        return that;
     };
 
 }());

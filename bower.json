@@ -1,6 +1,7 @@
 {
     "name": "aconite",
     "version": "0.1.0",
+    "main": "src/core.js",
     "ignore": [],
     "dependencies": {},
     "devDependencies": {}
