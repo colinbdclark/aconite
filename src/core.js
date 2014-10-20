@@ -3,6 +3,11 @@
 
     fluid.registerNamespace("aconite");
 
+    aconite.isIterable = function (o) {
+        var t = typeof o;
+        return o && o.length !== undefined && t !== "string" && t !== "function";
+    };
+
     aconite.setupWebGL = function (canvas, options) {
         function signalError (msg) {
             var str = window.WebGLRenderingContext ? OTHER_PROBLEM : GET_A_WEBGL_BROWSER;
@@ -87,6 +92,30 @@
         shaderProgram[variable] = location;
     };
 
+    aconite.initUniform = function (gl, shaderProgram, name, uniformSpec) {
+        if (uniformSpec.struct) {
+            var struct = fluid.getGlobalValue(uniformSpec.struct);
+            for (var i = 0; i < uniformSpec.count; ++i) {
+                for (var key in struct) {
+                    var fullvar = name + "[" + i + "]." + key;
+                    aconite.getUniformLocation(gl, shaderProgram, fullvar);
+                }
+            }
+        } else {
+            aconite.getUniformLocation(gl, shaderProgram, name);
+        }
+    };
+
+    aconite.initAttribute = function (gl, shaderProgram, name, attributeSpec) {
+        var pos = gl.getAttribLocation(shaderProgram, name);
+        if (attributeSpec.type === "vertexAttribArray") {
+            gl.enableVertexAttribArray(pos);
+        } else {
+            throw new Error("Unrecognised attribute type " + attributeSpec.type);
+        }
+        shaderProgram[variable] = pos;
+    };
+
     // TODO: Only log in case of errors, or use fluid.log for more fine-grained control of logging.
     aconite.initShaders = function (gl, variables, shaders) {
         var shaderProgram = gl.createProgram();
@@ -101,44 +130,38 @@
             throw new Error("Could not link shaders: " + gl.getProgramInfoLog(shaderProgram) +
                 " code " + gl.getError());
         }
+
         gl.useProgram(shaderProgram);
 
-        fluid.each(variables, function (info, variable) {
-            if (typeof(info) === "string") {
-                info = {
-                    storage: info
-                };
-            }
-
-            if (info.storage === "uniform") {
-                if (info.struct) {
-                    var struct = fluid.getGlobalValue(info.struct);
-                    for (var i = 0; i < info.count; ++i) {
-                        for (var key in struct) {
-                            var fullvar = variable + "[" + i + "]." + key;
-                            aconite.getUniformLocation(gl, shaderProgram, fullvar);
-                        }
-                    }
-                } else {
-                    aconite.getUniformLocation(gl, shaderProgram, variable);
-                }
-            } else if (info.storage === "attribute") {
-                var pos = gl.getAttribLocation(shaderProgram, variable);
-                if (info.type === "vertexAttribArray") {
-                    gl.enableVertexAttribArray(pos);
-                } else {
-                    throw new Error("Unrecognised attribute type " + info.type);
-                }
-                shaderProgram[variable] = pos;
-            }
-            else {
-                throw new Error("Unrecognised variable storage type " + info.storage);
-            }
+        fluid.each(variables.uniforms, function (uniformSpec, name) {
+            aconite.initUniform(gl, shaderProgram, name, uniformSpec);
+            console.log("code " +  gl.getError());
         });
 
-        console.log("code " +  gl.getError());
+        fluid.each(variables.attributes, function (attrSpec, name) {
+            aconite.initAttribute(gl, shaderProgram, name, attrSpec);
+            console.log("code " +  gl.getError());
+        });
 
         return shaderProgram;
+    };
+
+    // TODO: This function produces garbage each time it is called.
+    aconite.setUniform = function (gl, shaderProgram, name, type, values) {
+        values = aconite.isIterable(values) || [values];
+
+        var setter = "uniform" + values.length + type,
+            uniform = shaderProgram[name]
+            args = fluid.copy(values);
+
+        args.unshift(uniform);
+        gl[setter].apply(gl, args);
+    };
+
+    aconite.setUniforms = function (gl, shaderProgram, uniforms) {
+        fluid.each(uniforms, function (valueSpec, key) {
+            aconite.setUniform(gl, shaderProgram, key, valueSpec.type, valueSpec.value);
+        });
     };
 
     aconite.makeSquareVertexBuffer = function(gl, vertexPosition) {
@@ -160,55 +183,6 @@
         }
 
         return info;
-    };
-
-    fluid.defaults("aconite.animator", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
-
-        model: {
-            active: true
-        },
-
-        members: {
-            raf: window.requestAnimationFrame || window.webkitRequestAnimationFrame
-        },
-
-        invokers: {
-            start: {
-                func: "{that}.applier.change",
-                args: ["active", true]
-            },
-
-            stop: {
-                func: "{that}.applier.change",
-                args: ["active", false]
-            }
-        },
-
-        events: {
-            onTick: null,
-            onNextFrame: null
-        },
-
-        listeners: {
-            onTick: {
-                funcName: "flock.animator.tick",
-                args: ["{that}.model", "{that}.events.onNextFrame"]
-            },
-
-            onNextFrame: [
-                {
-                    func: "{that}.raf({that}.events.onTick.fire)",
-                    priority: "last"
-                }
-            ]
-        }
-    });
-
-    aconite.animator.tick = function (m, onNextFrame) {
-        if (m.active) {
-            onNextFrame();
-        };
     };
 
 }());

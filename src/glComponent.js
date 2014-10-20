@@ -4,14 +4,23 @@
     fluid.registerNamespace("aconite");
 
     fluid.defaults("aconite.glComponent", {
-        gradeNames: ["fluid.viewComponent", "autoInit"],
+        gradeNames: ["fluid.viewRelayComponent", "autoInit"],
+
+        shaders: {},                                // User specified.
+
+        uniforms: {                                 // User specified.
+            static: {},                             // Static uniforms are set once at startup time.
+            dynamic: {}                             // Dynamic uniforms are updated every frame from the model.
+        },
+
+        attributes: {},                             // User specified.
+
+        members: {
+            gl: "@expand:aconite.glComponent.createGL({that}, {that}.container, {that}.events.onGLReady.fire)"
+        },
 
         listeners: {
             onCreate: [
-                {
-                    funcName: "aconite.glComponent.setupWebGL",
-                    args: ["{that}", "{that}.dom.canvas"]
-                },
                 {
                     funcName: "aconite.loadShaders",
                     args: [
@@ -23,10 +32,16 @@
                 }
             ],
 
-            afterShadersLoaded: {
-                funcName: "aconite.glComponent.setupShaders",
-                args: ["{that}", "{arguments}.0"]
-            }
+            afterShadersLoaded: [
+                {
+                    funcName: "aconite.glComponent.setupShaders",
+                    args: ["{that}", "{arguments}.0"]
+                },
+                {
+                    funcName: "aconite.glComponent.initializeUniforms",
+                    args: ["{that}.gl", "{that}.shaderProgram", "{that}.options.uniforms"]
+                }
+            ]
         },
 
         events: {
@@ -34,23 +49,28 @@
             afterShadersLoaded: null,
             afterShaderProgramCompiled: null,
             onError: null
-        },
-
-        selectors: {
-            canvas: ".aconite-glComponent-canvas"
         }
     });
 
+    aconite.glComponent.createGL = function (that, container, onGLReady) {
+        var gl = aconite.setupWebGL(container[0]);
+        onGLReady(gl);
 
-    aconite.glComponent.setupWebGL = function (that, canvas) {
-        // TODO: Move to member expander
-        that.gl = aconite.setupWebGL(canvas[0]);
-        that.events.onGLReady.fire(that.gl);
+        return gl;
     };
 
-    aconite.glComponent.setupShaders = function (that, shaders) {
-        // TODO: Make member expander
-        that.shaderProgram = aconite.initShaders(that.gl, that.options.shaderVariables, shaders);
+    aconite.glComponent.setupShaders = function (that, shaders, attributes, uniforms) {
+        var shaderVariables = {
+            attributes: attributes,
+            uniforms: uniforms
+        };
+
+        that.shaderProgram = aconite.initShaders(that.gl, shaderVariables, shaders);
         that.events.afterShaderProgramCompiled.fire(that.shaderProgram);
+    };
+
+    aconite.glComponent.initializeUniforms = function (gl, shaderProgram, uniforms) {
+        aconite.setUniforms(uniforms.static);
+        aconite.setUniforms(uniforms.dynamic);
     };
 }());

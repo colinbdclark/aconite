@@ -7,7 +7,7 @@
      * Sequences the playback of a colection of clips described by the "clipSequence" option
      */
     fluid.defaults("aconite.clipSequencer", {
-        gradeNames: ["fluid.modelComponent", "fluid.eventedComponent", "autoInit"],
+        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
         model: {
             clipIdx: 0,
@@ -19,7 +19,7 @@
                 funcName: "aconite.clipSequencer.start",
                 args: [
                     "{that}.model",
-                    "{that}.clock",
+                    "{that}.scheduler",
                     "{that}.layer",
                     "{that}.preRoller",
                     "{that}.events.onNextClip",
@@ -29,7 +29,7 @@
         },
 
         components: {
-            clock: {
+            scheduler: {
                 type: "flock.scheduler.async"
             },
 
@@ -97,16 +97,16 @@
         return sequence[nextIdx];
     };
 
-    // TODO: Ridiculous arg list means ridiculous dependency structure.
-    aconite.clipSequencer.start = function (model, clock, layer, preRoller, onNextClip, loop) {
+    aconite.clipSequencer.start = function (model, scheduler, layer, preRoller, onNextClip, loop) {
         var idx = model.clipIdx = 0,
             sequence = model.clipSequence;
 
         layer.source.element.play();
-        aconite.clipSequencer.scheduleNextClip(model, sequence, clock, layer, preRoller, onNextClip, loop);
+        aconite.clipSequencer.scheduleNextClip(model, sequence, scheduler, layer, preRoller, onNextClip, loop);
     };
 
-    aconite.clipSequencer.scheduleNextClip = function (model, sequence, clock, layer, preRoller, onNextClip, loop) {
+    // TODO: Split this up to reduce dependencies.
+    aconite.clipSequencer.scheduleNextClip = function (model, sequence, scheduler, layer, preRoller, onNextClip, loop) {
         var idx = model.clipIdx >= sequence.length ? 0 : model.clipIdx,
             nextClip = aconite.clipSequencer.nextClip(model, sequence, loop),
             currentClip = sequence[idx];
@@ -116,10 +116,10 @@
         }
 
         aconite.clipSequencer.preRollClip(preRoller, nextClip);
-        clock.once(currentClip.duration, function () {
+        scheduler.once(currentClip.duration, function () {
             aconite.clipSequencer.displayClip(layer, nextClip, preRoller, onNextClip);
             model.clipIdx++;
-            aconite.clipSequencer.scheduleNextClip(model, sequence, clock, layer, preRoller, onNextClip, loop);
+            aconite.clipSequencer.scheduleNextClip(model, sequence, scheduler, layer, preRoller, onNextClip, loop);
         });
     };
 
@@ -165,7 +165,7 @@
         listeners: {
             onSequenceReady: [
                 {
-                    funcName: "{that}.applier.requestChange",
+                    func: "{that}.applier.change",
                     args: ["clipSequence", {
                         expander: {
                             funcName: "aconite.clipSequencer.mergeClipParams",
