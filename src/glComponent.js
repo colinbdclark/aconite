@@ -7,12 +7,7 @@
         gradeNames: ["fluid.viewRelayComponent", "autoInit"],
 
         shaders: {},                                // User specified.
-
-        uniforms: {                                 // User specified.
-            static: {},                             // Static uniforms are set once at startup time.
-            dynamic: {}                             // Dynamic uniforms are updated every frame from the model.
-        },
-
+        uniforms: {},                               // User specified.
         attributes: {},                             // User specified.
 
         members: {
@@ -35,10 +30,15 @@
             afterShadersLoaded: [
                 {
                     funcName: "aconite.glComponent.setupShaders",
-                    args: ["{that}", "{arguments}.0"]
+                    args: [
+                        "{that}",
+                        "{arguments}.0",
+                        "{that}.options.attributes",
+                        "{that}.options.uniforms"
+                    ]
                 },
                 {
-                    funcName: "aconite.glComponent.initializeUniforms",
+                    funcName: "aconite.setUniforms",
                     args: ["{that}.gl", "{that}.shaderProgram", "{that}.options.uniforms"]
                 }
             ]
@@ -69,8 +69,4 @@
         that.events.afterShaderProgramCompiled.fire(that.shaderProgram);
     };
 
-    aconite.glComponent.initializeUniforms = function (gl, shaderProgram, uniforms) {
-        aconite.setUniforms(uniforms.static);
-        aconite.setUniforms(uniforms.dynamic);
-    };
 }());

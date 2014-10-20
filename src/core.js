@@ -3,11 +3,6 @@
 
     fluid.registerNamespace("aconite");
 
-    aconite.isIterable = function (o) {
-        var t = typeof o;
-        return o && o.length !== undefined && t !== "string" && t !== "function";
-    };
-
     aconite.setupWebGL = function (canvas, options) {
         function signalError (msg) {
             var str = window.WebGLRenderingContext ? OTHER_PROBLEM : GET_A_WEBGL_BROWSER;
@@ -113,7 +108,7 @@
         } else {
             throw new Error("Unrecognised attribute type " + attributeSpec.type);
         }
-        shaderProgram[variable] = pos;
+        shaderProgram[name] = pos;
     };
 
     // TODO: Only log in case of errors, or use fluid.log for more fine-grained control of logging.
@@ -148,10 +143,10 @@
 
     // TODO: This function produces garbage each time it is called.
     aconite.setUniform = function (gl, shaderProgram, name, type, values) {
-        values = aconite.isIterable(values) || [values];
+        values = fluid.makeArray(values);
 
         var setter = "uniform" + values.length + type,
-            uniform = shaderProgram[name]
+            uniform = shaderProgram[name],
             args = fluid.copy(values);
 
         args.unshift(uniform);
