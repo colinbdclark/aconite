@@ -25,6 +25,10 @@
                     "{that}.events.onNextClip",
                     "{that}.options.loop"
                 ]
+            },
+
+            refresh: {
+                func: "{that}.layer.refresh"
             }
         },
 

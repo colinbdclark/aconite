@@ -67,6 +67,16 @@
         },
 
         invokers: {
+            play: {
+                "this": "{that}.element",
+                method: "play"
+            },
+
+            pause: {
+                "this": "{that}.element",
+                method: "pause"
+            },
+
             setURL: {
                 funcName: "aconite.video.updateVideoURL",
                 args: ["{that}", "{arguments}.0"]
@@ -161,6 +171,11 @@
 
     fluid.defaults("aconite.compositableVideo", {
         gradeNames: ["aconite.compositable", "autoInit"],
+
+        invokers: {
+            play: "{that}.source.play()",
+            pause: "{that}.source.pause()"
+        },
 
         components: {
             source: {

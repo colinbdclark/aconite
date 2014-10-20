@@ -86,9 +86,9 @@
                 ]
             },
 
-            start: "{that}.events.onStart.fire",
+            play: "{that}.events.onPlay.fire",
 
-            stop: "{that}.events.onStop.fire"
+            pause: "{that}.events.onPause.fire"
         },
 
         components: {
@@ -123,17 +123,17 @@
         },
 
         events: {
-            onStart: null,
-            onStop: null
+            onPlay: null,
+            onPause: null
         },
 
         listeners: {
-            onStart: {
+            onPlay: {
                 func: "{that}.clock.start",
                 priority: "last"
             },
 
-            onStop: {
+            onPause: {
                 func: "{that}.clock.stop",
                 priority: "first"
             }
@@ -178,6 +178,75 @@
     fluid.defaults("aconite.videoCompositor", {
         gradeNames: ["aconite.animator", "autoInit"],
 
+        invokers: {
+            render: "aconite.videoCompositor.refreshLayers({top}, {bottom})"
+        },
+
+        components: {
+            // User-specifiable.
+            top: {
+                type: "aconite.videoCompositor.topLayer"
+            },
+
+            // User-specifiable.
+            bottom: {
+                type: "aconite.videoCompositor.bottomLayer"
+            },
+
+            playButton: {
+                createOnEvent: "onVideosReady",
+                type: "aconite.ui.playButtonOverlay",
+                container: "{videoCompositor}.dom.playButton",
+                options: {
+                    listeners: {
+                        onPlay: [
+                            "{videoCompositor}.play()"
+                        ]
+                    }
+                }
+            }
+        },
+
+        events: {
+            onVideosReady: {
+                events: {
+                    topReady: "{top}.source.events.onReady",
+                    bottomReady: "{bottom}.source.events.onReady"
+                },
+                args: ["{arguments}.topReady.0", "{arguments}.bottomReady.0"]
+            }
+        },
+
+        listeners: {
+            onPlay: [
+                "{top}.play()",
+                "{bottom}.play()"
+            ]
+        },
+
+        selectors: {
+            playButton: ".aconite-animator-play"
+        }
+    });
+
+    // TODO: Naming both for this functions and its callees.
+    aconite.videoCompositor.refreshLayers = function (top, bottom) {
+        top.refresh();
+        bottom.refresh();
+    };
+
+    fluid.defaults("aconite.videoCompositor.topLayer", {
+        gradeNames: ["aconite.compositableVideo.layer", "autoInit"]
+    });
+
+    fluid.defaults("aconite.videoCompositor.bottomLayer", {
+        gradeNames: ["aconite.compositableVideo.layer", "autoInit"],
+        bindToTextureUnit: "TEXTURE1"
+    });
+
+    fluid.defaults("aconite.videoSequenceCompositor", {
+        gradeNames: ["aconite.videoCompositor", "autoInit"],
+
         components: {
             // User-specifiable.
             top: {
@@ -201,19 +270,6 @@
                         }
                     }
                 }
-            },
-
-            playButton: {
-                createOnEvent: "onVideosReady",
-                type: "aconite.ui.playButtonOverlay",
-                container: "{videoCompositor}.dom.playButton",
-                options: {
-                    listeners: {
-                        onPlay: [
-                            "{videoCompositor}.start()"
-                        ]
-                    }
-                }
             }
         },
 
@@ -225,27 +281,7 @@
                 },
                 args: ["{arguments}.topReady.0", "{arguments}.bottomReady.0"]
             }
-        },
-
-        listeners: {
-            onStart: [
-                "{top}.start()",
-                "{bottom}.start()"
-            ]
-        },
-
-        selectors: {
-            playButton: ".aconite-animator-play"
         }
-    });
-
-    fluid.defaults("aconite.videoCompositor.topLayer", {
-        gradeNames: ["aconite.compositableVideo.layer", "autoInit"]
-    });
-
-    fluid.defaults("aconite.videoCompositor.bottomLayer", {
-        gradeNames: ["aconite.compositableVideo.layer", "autoInit"],
-        bindToTextureUnit: "TEXTURE1"
     });
 
 }());
