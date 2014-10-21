@@ -40,7 +40,7 @@
         gl.compileShader(shader);
 
         if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            throw new Error("Error compiling " + type + " shader: " + gl.getShaderInfoLog(shader));
+            fluid.log(fluid.logLevel.FAIL, "Error compiling " + type + " shader: " + gl.getShaderInfoLog(shader));
         }
 
         return shader;
@@ -114,11 +114,11 @@
     // TODO: Only log in case of errors, or use fluid.log for more fine-grained control of logging.
     aconite.initShaders = function (gl, variables, shaders) {
         var shaderProgram = gl.createProgram();
-        console.log("code " +  gl.getError());
+        fluid.log(fluid.logLevel.INFO, "Create program status code: " +  gl.getError());
         gl.attachShader(shaderProgram, shaders.vertex);
-        console.log("code " +  gl.getError());
+        fluid.log(fluid.logLevel.INFO, "Attach vertex shader status code: " +  gl.getError());
         gl.attachShader(shaderProgram, shaders.fragment);
-        console.log("code " +  gl.getError());
+        fluid.log(fluid.logLevel.INFO, "Attach fragment shader status code " +  gl.getError());
         gl.linkProgram(shaderProgram);
 
         if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
@@ -130,12 +130,12 @@
 
         fluid.each(variables.uniforms, function (uniformSpec, name) {
             aconite.initUniform(gl, shaderProgram, name, uniformSpec);
-            console.log("code " +  gl.getError());
+            fluid.log(fluid.logLevel.INFO, "Init uniform '" + name + "' status code: " +  gl.getError());
         });
 
         fluid.each(variables.attributes, function (attrSpec, name) {
             aconite.initAttribute(gl, shaderProgram, name, attrSpec);
-            console.log("code " +  gl.getError());
+            fluid.log(fluid.logLevel.INFO, "Init attribute '" + name + "' status code: " +  gl.getError());
         });
 
         return shaderProgram;

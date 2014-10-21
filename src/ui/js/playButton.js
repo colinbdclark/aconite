@@ -47,7 +47,7 @@
     });
 
     aconite.ui.playButtonOverlay.play = function (playButton, onPlay, fullScreenerSel) {
-        var el = document.querySelector(fullScreenerSel),
+        var el = $(fullScreenerSel)[0],
             rfs = el.webkitRequestFullScreen ? "webkitRequestFullScreen" :
                 el.mozRequestFullScreen ? "mozRequestFullScreen" : "requestFullScreen";
 

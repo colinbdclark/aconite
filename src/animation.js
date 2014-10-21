@@ -157,7 +157,7 @@
     aconite.animator.setFrameRateUniforms = function (model, glRenderer, uniformModelMap) {
         for (var name in uniformModelMap) {
             var modelPath = uniformModelMap[name],
-                valueSpec = glRenderer.uniforms[name],
+                valueSpec = glRenderer.options.uniforms[name],
                 value = fluid.get(model, modelPath);
 
             aconite.setUniform(glRenderer.gl, glRenderer.shaderProgram, name, valueSpec.type, value);
