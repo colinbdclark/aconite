@@ -10,10 +10,17 @@
     fluid.defaults("aconite.ui.playButtonOverlay", {
         gradeNames: ["fluid.viewRelayComponent", "autoInit"],
 
+        playDelay: 6000,
+
         invokers: {
             play: {
                 funcName: "aconite.ui.playButtonOverlay.play",
-                args: ["{that}.container", "{that}.events.onPlay", "{that}.options.selectors.fullScreen"]
+                args: [
+                    "{that}.container",
+                    "{that}.events.onPlay",
+                    "{that}.options.selectors.fullScreen",
+                    "{that}.options.playDelay"
+                ]
             }
         },
 
@@ -46,13 +53,14 @@
         }
     });
 
-    aconite.ui.playButtonOverlay.play = function (playButton, onPlay, fullScreenerSel) {
+    aconite.ui.playButtonOverlay.play = function (playButton, onPlay, fullScreenerSel, playDelay) {
         var el = $(fullScreenerSel)[0],
             rfs = el.webkitRequestFullScreen ? "webkitRequestFullScreen" :
                 el.mozRequestFullScreen ? "mozRequestFullScreen" : "requestFullScreen";
 
         el[rfs]();
-        onPlay.fire();
+
+        setTimeout(onPlay.fire, playDelay);
     };
 
 }());
