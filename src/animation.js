@@ -54,7 +54,51 @@
     aconite.animationClock.tick = function (m, onNextFrame) {
         if (m.active) {
             onNextFrame();
-        };
+        }
+    };
+
+
+    fluid.defaults("aconite.animationClock.frameCounter", {
+        gradeNames: ["fluid.viewRelayComponent", "autoInit"],
+
+        refreshRate: 5,
+
+        model: {
+            lastTime: 0,
+            sum: 0,
+            frameCount: 0
+        },
+
+        invokers: {
+            refreshView: "aconite.animationClock.frameCounter.calcFPS({that}.dom.fpsCounter, {that}.model)"
+        },
+
+        listeners: {
+            "{animationClock}.events.onTick": {
+                funcName: "aconite.animationClock.frameCounter.calcFPS",
+                args: ["{that}.dom.fpsCounter", "{that}.options.refreshRate", "{that}.model"],
+                priority: "first"
+            }
+        },
+
+        selectors: {
+            fpsCounter: ".aconite-fps-counter"
+        }
+    });
+
+    aconite.animationClock.frameCounter.calcFPS = function (fpsCounter, refreshRate, m) {
+        var now = performance.now(),
+            rate = 1000 / (now - m.lastTime);
+
+        m.lastTime = now;
+        m.sum += rate;
+
+        if (m.frameCount >= refreshRate) {
+            fpsCounter.text(Math.round(m.sum / refreshRate));
+            m.frameCount = m.sum = 0;
+        }
+
+        m.frameCount++;
     };
 
 
