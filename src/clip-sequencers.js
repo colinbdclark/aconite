@@ -15,21 +15,9 @@
         },
 
         invokers: {
-            start: {
-                funcName: "aconite.clipSequencer.start",
-                args: [
-                    "{that}.model",
-                    "{that}.scheduler",
-                    "{that}.layer",
-                    "{that}.preRoller",
-                    "{that}.events.onNextClip",
-                    "{that}.options.loop"
-                ]
-            },
-
-            refresh: {
-                func: "{that}.layer.refresh"
-            }
+            play: "{that}.events.onPlay.fire()",
+            scheduleNextClip: "aconite.clipSequencer.scheduleNextClip({that})",
+            refresh: "{that}.layer.refresh()"
         },
 
         components: {
@@ -47,13 +35,20 @@
         events: {
             onSequenceReady: null,
             onReady: null,
-            onNextClip: null
+            onNextClip: null,
+            onPlay: null
         },
 
         listeners: {
-            onSequenceReady: {
-                funcName: "{that}.events.onReady.fire"
-            }
+            onSequenceReady: [
+                "aconite.clipSequencer.prepareForPlay({that})",
+                "{that}.events.onReady.fire()"
+            ],
+
+            onPlay: [
+                "{that}.layer.play()",
+                "{that}.scheduleNextClip()"
+            ]
         },
 
         loop: false
@@ -76,7 +71,7 @@
         aconite.clipSequencer.swapClips(layer.source, preRoller, clip.inTime);
     };
 
-    aconite.clipSequencer.preRollClip = function (preRoller, clip) {
+    aconite.clipSequencer.assignClip = function (vid, clip) {
         var url = clip.url,
             inTime = clip.inTime;
 
@@ -84,13 +79,13 @@
             url = url + "#t=" + inTime + "," + (inTime + clip.duration);
         }
 
-        preRoller.setURL(url);
+        vid.setURL(url);
     };
 
-    aconite.clipSequencer.nextClip = function (model, sequence, loop) {
-        var nextIdx = model.clipIdx + 1;
+    aconite.clipSequencer.nextClip = function (m, loop) {
+        var nextIdx = m.clipIdx + 1;
 
-        if (nextIdx >= sequence.length) {
+        if (nextIdx >= m.clipSequence.length) {
             if (loop) {
                 nextIdx = 0;
             } else {
@@ -98,33 +93,37 @@
             }
         }
 
-        return sequence[nextIdx];
+        return m.clipSequence[nextIdx];
     };
 
-    aconite.clipSequencer.start = function (model, scheduler, layer, preRoller, onNextClip, loop) {
-        var idx = model.clipIdx = 0,
-            sequence = model.clipSequence;
-
-        layer.source.element.play();
-        aconite.clipSequencer.scheduleNextClip(model, sequence, scheduler, layer, preRoller, onNextClip, loop);
+    aconite.clipSequencer.scheduleClipDisplay = function (atTime, that) {
+        that.scheduler.once(atTime, function () {
+            aconite.clipSequencer.displayClip(that.layer, nextClip, that.preRoller, that.events.onNextClip);
+            that.model.clipIdx++;
+            aconite.clipSequencer.scheduleNextClip(that);
+        });
     };
 
     // TODO: Split this up to reduce dependencies.
-    aconite.clipSequencer.scheduleNextClip = function (model, sequence, scheduler, layer, preRoller, onNextClip, loop) {
-        var idx = model.clipIdx >= sequence.length ? 0 : model.clipIdx,
-            nextClip = aconite.clipSequencer.nextClip(model, sequence, loop),
-            currentClip = sequence[idx];
+    aconite.clipSequencer.scheduleNextClip = function (that) {
+        var m = that.model,
+            idx = m.clipIdx >= m.clipSequence.length ? 0 : m.clipIdx,
+            nextClip = aconite.clipSequencer.nextClip(m, that.options.loop),
+            currentClip = m.clipSequence[idx];
 
         if (!nextClip) {
             return;
         }
 
-        aconite.clipSequencer.preRollClip(preRoller, nextClip);
-        scheduler.once(currentClip.duration, function () {
-            aconite.clipSequencer.displayClip(layer, nextClip, preRoller, onNextClip);
-            model.clipIdx++;
-            aconite.clipSequencer.scheduleNextClip(model, sequence, scheduler, layer, preRoller, onNextClip, loop);
-        });
+        aconite.clipSequencer.assignClip(that.preRoller, nextClip);
+        aconite.clipSequencer.scheduleClipDisplay(currentClip.duration, that);
+    };
+
+    aconite.clipSequencer.prepareForPlay = function (that) {
+        var firstClip = that.model.clipSequence[0];
+        aconite.clipSequencer.assignClip(that.preRoller, firstClip);
+        aconite.clipSequencer.assignClip(that.layer.source, firstClip);
+        that.events.onNextClip.fire(firstClip);
     };
 
     aconite.clipSequencer.mergeClipParams = function (clipSequence, defaultParams) {
