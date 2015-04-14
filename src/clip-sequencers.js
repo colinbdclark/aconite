@@ -71,17 +71,6 @@
         aconite.clipSequencer.swapClips(layer.source, preRoller, clip.inTime);
     };
 
-    aconite.clipSequencer.assignClip = function (vid, clip) {
-        var url = clip.url,
-            inTime = clip.inTime;
-
-        if (clip.inTime) {
-            url = url + "#t=" + inTime + "," + (inTime + clip.duration);
-        }
-
-        vid.setURL(url);
-    };
-
     aconite.clipSequencer.nextClip = function (m, loop) {
         var nextIdx = m.clipIdx + 1;
 
@@ -96,12 +85,23 @@
         return m.clipSequence[nextIdx];
     };
 
-    aconite.clipSequencer.scheduleClipDisplay = function (atTime, that) {
+    aconite.clipSequencer.scheduleClipDisplay = function (atTime, nextClip, that) {
         that.scheduler.once(atTime, function () {
             aconite.clipSequencer.displayClip(that.layer, nextClip, that.preRoller, that.events.onNextClip);
             that.model.clipIdx++;
             aconite.clipSequencer.scheduleNextClip(that);
         });
+    };
+
+    aconite.clipSequencer.expandClip = function (clip) {
+        if (clip.duration) {
+            return;
+        }
+
+        var inSecs = aconite.video.parseTimecode(clip.inTime),
+            outSecs = aconite.video.parseTimecode(clip.outTime);
+
+        clip.duration = outSecs - inSecs;
     };
 
     // TODO: Split this up to reduce dependencies.
@@ -111,18 +111,20 @@
             nextClip = aconite.clipSequencer.nextClip(m, that.options.loop),
             currentClip = m.clipSequence[idx];
 
+        aconite.clipSequencer.expandClip(currentClip);
+
         if (!nextClip) {
             return;
         }
 
-        aconite.clipSequencer.assignClip(that.preRoller, nextClip);
-        aconite.clipSequencer.scheduleClipDisplay(currentClip.duration, that);
+        aconite.video.assignClip(that.preRoller, nextClip);
+        aconite.clipSequencer.scheduleClipDisplay(currentClip.duration, nextClip, that);
     };
 
     aconite.clipSequencer.prepareForPlay = function (that) {
         var firstClip = that.model.clipSequence[0];
-        aconite.clipSequencer.assignClip(that.preRoller, firstClip);
-        aconite.clipSequencer.assignClip(that.layer.source, firstClip);
+        aconite.video.assignClip(that.preRoller, firstClip);
+        aconite.video.assignClip(that.layer.source, firstClip);
         that.events.onNextClip.fire(firstClip);
     };
 
