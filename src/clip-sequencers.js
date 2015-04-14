@@ -66,8 +66,8 @@
         preRoller.element = displayEl;
     };
 
-    aconite.clipSequencer.displayClip = function (layer, clip, preRoller, onNextClip) {
-        onNextClip.fire(clip);
+    aconite.clipSequencer.displayClip = function (layer, clip, clipIdx, preRoller, onNextClip) {
+        onNextClip.fire(clip, clipIdx);
         aconite.clipSequencer.swapClips(layer.source, preRoller, clip.inTime);
     };
 
@@ -87,21 +87,25 @@
 
     aconite.clipSequencer.scheduleClipDisplay = function (atTime, nextClip, that) {
         that.scheduler.once(atTime, function () {
-            aconite.clipSequencer.displayClip(that.layer, nextClip, that.preRoller, that.events.onNextClip);
+            aconite.clipSequencer.displayClip(that.layer, nextClip, that.model.clipIdx, that.preRoller, that.events.onNextClip);
             that.model.clipIdx++;
             aconite.clipSequencer.scheduleNextClip(that);
         });
     };
 
-    aconite.clipSequencer.expandClip = function (clip) {
+    aconite.clipSequencer.calcDuration = function (clip) {
         if (clip.duration) {
-            return;
+            return clip.duration;
         }
 
         var inSecs = aconite.video.parseTimecode(clip.inTime),
             outSecs = aconite.video.parseTimecode(clip.outTime);
 
-        clip.duration = outSecs - inSecs;
+        return outSecs - inSecs;
+    };
+
+    aconite.clipSequencer.expandClip = function (clip) {
+        clip.duration = aconite.clipSequencer.calcDuration(clip);
     };
 
     // TODO: Split this up to reduce dependencies.
@@ -125,7 +129,7 @@
         var firstClip = that.model.clipSequence[0];
         aconite.video.assignClip(that.preRoller, firstClip);
         aconite.video.assignClip(that.layer.source, firstClip);
-        that.events.onNextClip.fire(firstClip);
+        that.events.onNextClip.fire(firstClip, 0);
     };
 
     aconite.clipSequencer.mergeClipParams = function (clipSequence, defaultParams) {
