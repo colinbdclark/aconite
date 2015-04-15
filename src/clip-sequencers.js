@@ -41,6 +41,7 @@
 
         listeners: {
             onSequenceReady: [
+                "aconite.clipSequencer.expandClips({that})",
                 "aconite.clipSequencer.prepareForPlay({that})",
                 "{that}.events.onReady.fire()"
             ],
@@ -56,9 +57,10 @@
 
     aconite.clipSequencer.swapClips = function (source, preRoller, inTime) {
         var displayEl = source.element,
-            preRollEl = preRoller.element;
+            preRollEl = preRoller.element,
+            parsed = aconite.video.parseTimecode(inTime);
 
-        preRollEl.currentTime = inTime === undefined ? 0 : inTime;
+        preRollEl.currentTime = parsed === undefined ? 0 : parsed;
         preRollEl.play();
         displayEl.pause();
 
@@ -106,6 +108,11 @@
 
     aconite.clipSequencer.expandClip = function (clip) {
         clip.duration = aconite.clipSequencer.calcDuration(clip);
+    };
+
+    aconite.clipSequencer.expandClips = function (that) {
+        fluid.each(that.model.clipSequence, aconite.clipSequencer.expandClip);
+        that.applier.change("clipSequence", that.model.clipSequence);
     };
 
     // TODO: Split this up to reduce dependencies.
