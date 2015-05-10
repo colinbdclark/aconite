@@ -5,3 +5,13 @@
     left: 720px;
     display: none;
 }
+
+.aconite-full-screen {
+    cursor: none;
+}
+
+.aconite-fps-display {
+    z-index: 2;
+    color: #fff;
+    text-align: right;
+}

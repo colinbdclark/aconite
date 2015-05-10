@@ -10,7 +10,7 @@
     fluid.defaults("aconite.ui.playButtonOverlay", {
         gradeNames: ["fluid.viewRelayComponent", "autoInit"],
 
-        playDelay: 6000,
+        playDelay: 10,
 
         invokers: {
             play: {
@@ -25,7 +25,8 @@
         },
 
         events: {
-            onPlay: null
+            onPlay: null,
+            onFullScreenChange: null
         },
 
         listeners: {
@@ -39,28 +40,66 @@
                     "this": "{that}.container",
                     method: "click",
                     args: ["{that}.play"]
+                },
+
+                {
+                    funcName: "aconite.ui.playButtonOverlay.bindFullScreenListener",
+                    args: [
+                        "{that}.options.selectors.fullScreen",
+                        "{that}.events.onFullScreenChange.fire"
+                    ]
                 }
             ],
 
             onPlay: {
                 "this": "{that}.container",
                 method: "hide"
+            },
+
+            onFullScreenChange: {
+                funcName: "aconite.ui.playButtonOverlay.toggleCursor",
+                args: ["{that}.options.selectors.fullScreen", "{that}.options.styles"]
             }
         },
 
         selectors: {
             fullScreen: "body"
+        },
+
+        styles: {
+            fullScreen: "aconite-full-screen"
         }
     });
 
-    aconite.ui.playButtonOverlay.play = function (playButton, onPlay, fullScreenerSel, playDelay) {
-        var el = $(fullScreenerSel)[0],
+    aconite.ui.playButtonOverlay.fullScreenEventNames = [
+        "fullscreenchange",
+        "webkitfullscreenchange",
+        "mozfullscreenchange",
+        "msfullscreenchange"
+    ];
+
+    aconite.ui.playButtonOverlay.bindFullScreenListener = function (fullScreenSel, onFullScreenChange) {
+        var el = document.querySelector(fullScreenSel);
+
+        fluid.each(aconite.ui.playButtonOverlay.fullScreenEventNames, function (eventName) {
+            el.addEventListener(eventName, onFullScreenChange);
+        });
+    };
+
+    aconite.ui.playButtonOverlay.play = function (playButton, onPlay, fullScreenSel, playDelay) {
+        var jEl = $(fullScreenSel),
+            el = jEl[0],
             rfs = el.webkitRequestFullScreen ? "webkitRequestFullScreen" :
                 el.mozRequestFullScreen ? "mozRequestFullScreen" : "requestFullScreen";
 
         el[rfs]();
 
-        setTimeout(onPlay.fire, playDelay);
+        setTimeout(onPlay.fire, playDelay * 1000);
+    };
+
+    aconite.ui.playButtonOverlay.toggleCursor = function (fullScreenSel, styles) {
+        var el = $(fullScreenSel);
+        el.toggleClass(styles.fullScreen);
     };
 
 }());
