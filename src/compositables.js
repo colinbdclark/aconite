@@ -54,6 +54,9 @@
         gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
         model: {
+            inTime: null,
+            outTime: null,
+            duration: null,
             url: "{that}.options.url"
         },
 
@@ -61,7 +64,7 @@
             element: {
                 expander: {
                     funcName: "aconite.video.setupVideo",
-                    args: ["{that}", "{that}.options.url"]
+                    args: ["{that}", "{that}.model"]
                 }
             }
         },
@@ -77,15 +80,16 @@
                 method: "pause"
             },
 
-            setURL: {
-                funcName: "aconite.video.updateVideoURL",
-                args: ["{that}", "{arguments}.0"]
-            },
+            setURL: "{that}.applier.change(url, {arguments}.0)",
 
             isReady: {
                 funcName: "aconite.video.isReady",
                 args: ["{that}", "{that}.element"]
             }
+        },
+
+        modelListeners: {
+            "*": "aconite.video.updateVideoURL({that})"
         },
 
         events: {
@@ -101,8 +105,25 @@
         }
     });
 
-    aconite.video.renderVideo = function (that, url) {
-        var videoHTML = fluid.stringTemplate(that.options.templates.video, {
+    // TODO: Harmonize this with other time fragment code elsewhere.
+    aconite.video.composeURL = function (model) {
+        var timeFrag = "";
+
+        if (aconite.video.isTimeUnit(model.inTime)) {
+            timeFrag += "#t=" + model.inTime;
+            if (aconite.video.isTimeUnit(model.outTime)) {
+                timeFrag += "," + model.outTime;
+            } else if (typeof model.duration === "number") {
+                timeFrag += "," + aconite.video.parseTimecode(model.inTime) + model.duration;
+            }
+        }
+
+        return model.url + timeFrag;
+    };
+
+    aconite.video.renderVideo = function (that, model) {
+        var url = aconite.video.composeURL(model),
+            videoHTML = fluid.stringTemplate(that.options.templates.video, {
             url: url
         });
 
@@ -133,9 +154,8 @@
     };
 
     // TODO: Properly modelize this.
-    aconite.video.updateVideoURL = function (that, url) {
-        that.model.url = url;
-        that.element.src = url;
+    aconite.video.updateVideoURL = function (that) {
+        that.element.src = aconite.video.composeURL(that.model);
         return that.element;
     };
 

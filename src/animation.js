@@ -188,7 +188,6 @@
         }
     });
 
-
     aconite.animator.makeStageVertex = function (gl, vertexPosition, color) {
         // Initialize to black
         gl.clearColor(color.r, color.g, color.b, color.a);
@@ -218,6 +217,36 @@
     };
 
 
+    fluid.defaults("aconite.animator.playable", {
+        gradeNames: ["aconite.animator", "autoInit"],
+
+        components: {
+            playButton: {
+                options: {
+                    selectors: {
+                        fullScreen: "{playable}.options.selectors.stage"
+                    }
+                }
+            }
+        }
+    });
+
+    fluid.defaults("aconite.animator.debugging", {
+        gradeNames: ["aconite.animator", "autoInit"],
+
+        components: {
+            frameCounter: {
+                type: "aconite.animationClock.frameCounter",
+                container: "{that}.options.selectors.fpsCounter"
+            }
+        },
+
+        selectors: {
+            fpsCounter: ".aconite-fps-display"
+        }
+    });
+
+
     // TODO: Generalize this to an arbitrary number of layers.
     fluid.defaults("aconite.videoCompositor", {
         gradeNames: ["aconite.animator", "autoInit"],
@@ -227,6 +256,10 @@
         },
 
         components: {
+            glRenderer: {
+                type: "aconite.videoCompositor.glRenderer"
+            },
+
             // User-specifiable.
             top: {
                 type: "aconite.videoCompositor.topLayer"
@@ -279,6 +312,41 @@
         bottom.refresh();
     };
 
+
+    fluid.defaults("aconite.videoCompositor.glRenderer", {
+        gradeNames: ["aconite.glComponent", "autoInit"],
+
+        // TODO: Factor these URLs that they can be
+        // correctly relative to the user's project
+        shaders: {
+            fragment: "shaders/fragmentShader.frag",
+            vertex: "shaders/stageVertexShader.vert"
+        },
+
+        attributes: {
+            aVertexPosition: {
+                type: "vertexAttribArray"
+            }
+        },
+
+        uniforms: {
+            topSampler: {
+                type: "i",
+                value: 0
+            },
+            bottomSampler: {
+                type: "i",
+                value: 1
+            },
+            textureSize: {
+                type: "f",
+                value: [
+                    "{videoCompositor}.dom.stage.0.width", "{videoCompositor}.dom.stage.0.height"
+                ]
+            }
+        }
+
+    });
     fluid.defaults("aconite.videoCompositor.topLayer", {
         gradeNames: ["aconite.compositableVideo.layer", "autoInit"]
     });
