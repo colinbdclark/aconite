@@ -150,28 +150,36 @@
                 type: "aconite.glComponent",
                 container: "{animator}.dom.stage",
                 options: {
-                    listeners: {
-                        afterShaderProgramCompiled: [
-                            {
-                                funcName: "aconite.animator.makeStageVertex",
-                                args: [
-                                    "{that}.gl",
-                                    "{that}.shaderProgram.aVertexPosition",
-                                    "{animator}.options.stageBackgroundColor"
-                                ]
-                            }
-                        ]
+                    events: {
+                        afterShaderProgramCompiled: "{animator}.events.onReady"
                     }
                 }
             }
         },
 
         events: {
+            onReady: null,
             onPlay: null,
             onPause: null
         },
 
         listeners: {
+            onReady: [
+                {
+                    funcName: "aconite.animator.setStageColor",
+                    args: ["{glRenderer}.gl", "{that}.options.stageBackgroundColor"]
+
+                },
+
+                {
+                    funcName: "aconite.animator.makeStageVertex",
+                    args: [
+                        "{glRenderer}.gl",
+                        "{glRenderer}.shaderProgram.aVertexPosition"
+                    ]
+                }
+            ],
+
             onPlay: {
                 func: "{that}.clock.start",
                 priority: "last"
@@ -188,10 +196,12 @@
         }
     });
 
+    aconite.animator.setStageColor = function (gl, color) {
+        gl.clearColor(color.r, color.g, color.b, color.a);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    };
 
     aconite.animator.makeStageVertex = function (gl, vertexPosition, color) {
-        // Initialize to black
-        gl.clearColor(color.r, color.g, color.b, color.a);
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -218,6 +228,36 @@
     };
 
 
+    fluid.defaults("aconite.animator.playable", {
+        gradeNames: ["aconite.animator", "autoInit"],
+
+        components: {
+            playButton: {
+                options: {
+                    selectors: {
+                        fullScreen: "{playable}.options.selectors.stage"
+                    }
+                }
+            }
+        }
+    });
+
+    fluid.defaults("aconite.animator.debugging", {
+        gradeNames: ["aconite.animator", "autoInit"],
+
+        components: {
+            frameCounter: {
+                type: "aconite.animationClock.frameCounter",
+                container: "{that}.options.selectors.fpsCounter"
+            }
+        },
+
+        selectors: {
+            fpsCounter: ".aconite-fps-display"
+        }
+    });
+
+
     // TODO: Generalize this to an arbitrary number of layers.
     fluid.defaults("aconite.videoCompositor", {
         gradeNames: ["aconite.animator", "autoInit"],
@@ -227,6 +267,10 @@
         },
 
         components: {
+            glRenderer: {
+                type: "aconite.videoCompositor.glRenderer"
+            },
+
             // User-specifiable.
             top: {
                 type: "aconite.videoCompositor.topLayer"
@@ -242,16 +286,17 @@
                 type: "aconite.ui.playButtonOverlay",
                 container: "{videoCompositor}.dom.playButton",
                 options: {
-                    listeners: {
-                        onPlay: [
-                            "{videoCompositor}.play()"
-                        ]
+                    events: {
+                        onActivated: "{videoCompositor}.events.onStart",
+                        onPlay: "{videoCompositor}.events.onPlay"
                     }
                 }
             }
         },
 
         events: {
+            onStart: null,
+
             onVideosReady: {
                 events: {
                     topReady: "{top}.source.events.onReady",
@@ -279,6 +324,41 @@
         bottom.refresh();
     };
 
+
+    fluid.defaults("aconite.videoCompositor.glRenderer", {
+        gradeNames: ["aconite.glComponent", "autoInit"],
+
+        // TODO: Factor these URLs that they can be
+        // correctly relative to the user's project
+        shaders: {
+            fragment: "shaders/fragmentShader.frag",
+            vertex: "shaders/stageVertexShader.vert"
+        },
+
+        attributes: {
+            aVertexPosition: {
+                type: "vertexAttribArray"
+            }
+        },
+
+        uniforms: {
+            topSampler: {
+                type: "i",
+                value: 0
+            },
+            bottomSampler: {
+                type: "i",
+                value: 1
+            },
+            textureSize: {
+                type: "f",
+                value: [
+                    "{videoCompositor}.dom.stage.0.width", "{videoCompositor}.dom.stage.0.height"
+                ]
+            }
+        }
+
+    });
     fluid.defaults("aconite.videoCompositor.topLayer", {
         gradeNames: ["aconite.compositableVideo.layer", "autoInit"]
     });
