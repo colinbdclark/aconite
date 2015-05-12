@@ -150,28 +150,36 @@
                 type: "aconite.glComponent",
                 container: "{animator}.dom.stage",
                 options: {
-                    listeners: {
-                        afterShaderProgramCompiled: [
-                            {
-                                funcName: "aconite.animator.makeStageVertex",
-                                args: [
-                                    "{that}.gl",
-                                    "{that}.shaderProgram.aVertexPosition",
-                                    "{animator}.options.stageBackgroundColor"
-                                ]
-                            }
-                        ]
+                    events: {
+                        afterShaderProgramCompiled: "{animator}.events.onReady"
                     }
                 }
             }
         },
 
         events: {
+            onReady: null,
             onPlay: null,
             onPause: null
         },
 
         listeners: {
+            onReady: [
+                {
+                    funcName: "aconite.animator.setStageColor",
+                    args: ["{glRenderer}.gl", "{that}.options.stageBackgroundColor"]
+
+                },
+
+                {
+                    funcName: "aconite.animator.makeStageVertex",
+                    args: [
+                        "{glRenderer}.gl",
+                        "{glRenderer}.shaderProgram.aVertexPosition"
+                    ]
+                }
+            ],
+
             onPlay: {
                 func: "{that}.clock.start",
                 priority: "last"
@@ -188,9 +196,12 @@
         }
     });
 
-    aconite.animator.makeStageVertex = function (gl, vertexPosition, color) {
-        // Initialize to black
+    aconite.animator.setStageColor = function (gl, color) {
         gl.clearColor(color.r, color.g, color.b, color.a);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    };
+
+    aconite.animator.makeStageVertex = function (gl, vertexPosition, color) {
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -275,16 +286,17 @@
                 type: "aconite.ui.playButtonOverlay",
                 container: "{videoCompositor}.dom.playButton",
                 options: {
-                    listeners: {
-                        onPlay: [
-                            "{videoCompositor}.play()"
-                        ]
+                    events: {
+                        onActivated: "{videoCompositor}.events.onStart",
+                        onPlay: "{videoCompositor}.events.onPlay"
                     }
                 }
             }
         },
 
         events: {
+            onStart: null,
+
             onVideosReady: {
                 events: {
                     topReady: "{top}.source.events.onReady",

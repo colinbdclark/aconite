@@ -17,7 +17,8 @@
                 funcName: "aconite.ui.playButtonOverlay.play",
                 args: [
                     "{that}.container",
-                    "{that}.events.onPlay",
+                    "{that}.events.onActivated.fire",
+                    "{that}.events.onPlay.fire",
                     "{that}.options.selectors.fullScreen",
                     "{that}.options.playDelay"
                 ]
@@ -25,6 +26,7 @@
         },
 
         events: {
+            onActivated: null,
             onPlay: null,
             onFullScreenChange: null
         },
@@ -86,15 +88,17 @@
         });
     };
 
-    aconite.ui.playButtonOverlay.play = function (playButton, onPlay, fullScreenSel, playDelay) {
+    aconite.ui.playButtonOverlay.play = function (playButton, onActivated, onPlay, fullScreenSel, playDelay) {
         var jEl = $(fullScreenSel),
             el = jEl[0],
             rfs = el.webkitRequestFullScreen ? "webkitRequestFullScreen" :
                 el.mozRequestFullScreen ? "mozRequestFullScreen" : "requestFullScreen";
 
+        onActivated();
+
         el[rfs]();
 
-        setTimeout(onPlay.fire, playDelay * 1000);
+        setTimeout(onPlay, playDelay * 1000);
     };
 
     aconite.ui.playButtonOverlay.toggleCursor = function (fullScreenSel, styles) {
