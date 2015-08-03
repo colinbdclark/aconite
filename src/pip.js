@@ -1,3 +1,13 @@
+/*
+ * Aconite Pip Component
+ * http://github.com/colinbdclark/aconite
+ *
+ * Copyright 2013-2015, Colin Clark
+ * Distributed under the MIT license.
+ */
+
+/*global fluid, aconite, flock, console*/
+
 (function () {
     "use strict";
 
@@ -109,7 +119,7 @@
                 mul: 0.2,
                 envelope: {
                     levels: [0, 1, 1, 0],
-                    times: [0, 1/60, 0]
+                    times: [0, 1 / 60, 0]
                 }
             }
         }

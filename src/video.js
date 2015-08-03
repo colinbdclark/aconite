@@ -1,3 +1,13 @@
+/*
+ * Aconite Video
+ * http://github.com/colinbdclark/aconite
+ *
+ * Copyright 2013-2015, Colin Clark
+ * Distributed under the MIT license.
+ */
+
+/*global fluid, aconite, jQuery*/
+
 (function () {
     "use strict";
 
@@ -78,7 +88,7 @@
             url: url
         });
 
-        var video = $(videoHTML);
+        var video = jQuery(videoHTML);
 
         video.bind("canplay", function () {
             that.events.onVideoLoaded.fire(video);
@@ -94,7 +104,7 @@
     aconite.video.setupVideo = function (that, url) {
         var video = aconite.video.renderVideo(that, url);
 
-        var once = function (e) {
+        var once = function () {
             that.events.onReady.fire(that);
             video.removeEventListener("canplay", once, true);
         };
@@ -159,7 +169,7 @@
         if (aconite.video.isTimeUnit(clip.inTime) && aconite.video.isTimeUnit(clip.outTime)) {
             inTime = clip.inTime;
             outTime = clip.outTime;
-        } else if (typeof clip.inTime === "number" && typeof clip.duration == "number") {
+        } else if (typeof clip.inTime === "number" && typeof clip.duration === "number") {
             inTime = clip.inTime;
             outTime = inTime + clip.duration;
         }

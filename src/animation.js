@@ -1,3 +1,13 @@
+/*
+ * Aconite Animation
+ * http://github.com/colinbdclark/aconite
+ *
+ * Copyright 2013-2015, Colin Clark
+ * Distributed under the MIT license.
+ */
+
+/*global fluid, aconite, performance*/
+
 (function () {
     "use strict";
 
@@ -201,7 +211,7 @@
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     };
 
-    aconite.animator.makeStageVertex = function (gl, vertexPosition, color) {
+    aconite.animator.makeStageVertex = function (gl, vertexPosition) {
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

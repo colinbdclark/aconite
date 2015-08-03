@@ -1,3 +1,13 @@
+/*
+ * Aconite Final Cut Pro XML Parser
+ * http://github.com/colinbdclark/aconite
+ *
+ * Copyright 2013-2015, Colin Clark
+ * Distributed under the MIT license.
+ */
+
+/*global fluid, aconite, jQuery*/
+
 (function () {
     "use strict";
 
@@ -39,7 +49,7 @@
         jQuery.ajax({
             url: xmlUrl,
             method: "GET",
-            success: function (data, textStatus, jqXHR) {
+            success: function (data) {
                 onXMLReady(jQuery(data));
             },
             error: onError,
@@ -49,28 +59,28 @@
 
     aconite.fcpxmlParser.parse = function (fcpXML, assetUrlMap, afterParsed) {
         var clips = fcpXML.find("clip"),
-            clipSequence = aconite.fcpxlParser.clipSpecs(clips);
+            clipSequence = aconite.fcpxlParser.clipSpecs(clips, fcpXML);
 
         afterParsed(clipSequence);
 
         return clipSequence;
     };
 
-    aconite.fcpxmlParser.clipSpecs = function (clips) {
+    aconite.fcpxmlParser.clipSpecs = function (clips, fcpXML) {
         var clipSequence = [];
 
         fluid.each(clips, function (clip) {
             clip = jQuery(clip);
 
-            var clipSpec = aconite.fcpxmlParser.clipSpec(clip);
-            clipSpec.url = aconite.fcpxmlParser.getRelativeClipURL(clipSpec.src, assetUrlMap);
+            var clipSpec = aconite.fcpxmlParser.clipSpec(clip, fcpXML);
+            clipSpec.url = aconite.fcpxmlParser.getRelativeClipURL(clipSpec.src);
             clipSequence.push(clipSpec);
         });
 
         return clipSequence;
     };
 
-    aconite.fcpxmlParser.clipSpec = function (clipEl) {
+    aconite.fcpxmlParser.clipSpec = function (clipEl, fcpXML) {
         var assetId = clipEl.find("video").attr("ref"),
             asset = fcpXML.find("asset#" + assetId),
             startAttr = clipEl.attr("start"),

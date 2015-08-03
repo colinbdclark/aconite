@@ -1,3 +1,13 @@
+/*
+ * Aconite Clip Sequencers
+ * http://github.com/colinbdclark/aconite
+ *
+ * Copyright 2013-2015, Colin Clark
+ * Distributed under the MIT license.
+ */
+
+/*global fluid, aconite, jQuery*/
+
 (function () {
     "use strict";
 
@@ -142,7 +152,7 @@
     aconite.clipSequencer.mergeClipParams = function (clipSequence, defaultParams) {
         return fluid.transform(clipSequence, function (clip) {
             var defaults = defaultParams[clip.url];
-            return $.extend(true, clip, defaults);
+            return jQuery.extend(true, clip, defaults);
         });
     };
 

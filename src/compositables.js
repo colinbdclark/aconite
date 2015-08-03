@@ -1,3 +1,13 @@
+/*
+ * Aconite Compositables
+ * http://github.com/colinbdclark/aconite
+ *
+ * Copyright 2013-2015, Colin Clark
+ * Distributed under the MIT license.
+ */
+
+/*global fluid, aconite*/
+
 (function () {
     "use strict";
 
