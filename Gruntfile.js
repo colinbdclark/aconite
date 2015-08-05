@@ -26,6 +26,7 @@ module.exports = function(grunt) {
             "src/glComponent.js",
             "src/animation.js",
             "src/video.js",
+            "src/video-player.js",
             "src/compositables.js",
             "src/clip-sequencers.js",
             "src/fcpxml-parser.js",
@@ -58,6 +59,11 @@ module.exports = function(grunt) {
             all: {
                 src: [].concat(files.jQuery, files.infusion, files.aconite),
                 dest: "dist/<%= pkg.name %>-all.js"
+            },
+
+            only: {
+                src: [].concat(files.aconite),
+                dest: "dist/<%= pkg.name %>-only.js"
             }
         },
 
