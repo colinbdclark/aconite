@@ -89,8 +89,8 @@
 
     aconite.clipSequencer.scheduleClipDisplay = function (atTime, nextClip, that) {
         that.scheduler.once(atTime, function () {
-            aconite.clipSequencer.displayClip(that.layer, nextClip, that.model.clipIdx, that.preRoller, that.events.onNextClip);
             that.model.clipIdx++;
+            aconite.clipSequencer.displayClip(that.layer, nextClip, that.model.clipIdx, that.preRoller, that.events.onNextClip);
             aconite.clipSequencer.scheduleNextClip(that);
         });
     };
