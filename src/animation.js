@@ -33,6 +33,16 @@
             stop: {
                 func: "{that}.applier.change",
                 args: ["active", false]
+            },
+
+            tick: {
+                funcName: "aconite.animationClock.tick",
+                args: ["{that}.model", "{that}.events.onNextFrame.fire"]
+            },
+
+            scheduleNextTick: {
+                func: "{that}.raf",
+                args: ["{that}.events.onTick.fire"]
             }
         },
 
@@ -42,22 +52,17 @@
         },
 
         listeners: {
-            onTick: {
-                funcName: "aconite.animationClock.tick",
-                args: ["{that}.model", "{that}.events.onNextFrame.fire"]
-            },
+            onTick: [
+                "{that}.tick()"
+            ],
 
             onNextFrame: [
-                {
-                    func: "{that}.raf",
-                    args: ["{that}.events.onTick.fire"],
-                    priority: "last"
-                }
+                "{that}.scheduleNextTick()"
             ]
         },
 
         modelListeners: {
-            "active": "{that}.events.onTick.fire"
+            "active": "{that}.events.onTick.fire()"
         }
     });
 
@@ -71,24 +76,41 @@
     fluid.defaults("aconite.animationClock.frameCounter", {
         gradeNames: ["fluid.viewRelayComponent", "autoInit"],
 
-        refreshRate: 5,
+        numFrames: 72000, // 20 minutes at 60 fps
+
+        members: {
+            frameDurations: {
+                expander: {
+                    funcName: "aconite.animationClock.frameCounter.initFrameDurations",
+                    args: ["{that}.options.numFrames"]
+                }
+            }
+        },
 
         model: {
-            lastTime: 0,
-            sum: 0,
+            lastTime: null,
             frameCount: 0
         },
 
         invokers: {
-            refreshView: "aconite.animationClock.frameCounter.calcFPS({that}.dom.fpsCounter, {that}.model)"
+            recordTime: {
+                funcName: "aconite.animationClock.frameCounter.recordTime",
+                args: [ "{that}.frameDurations", "{that}.model"]
+            },
+
+            maxDuration: {
+                funcName: "aconite.animationClock.frameCounter.maxDuration",
+                args: ["{that}.frameDurations"]
+            },
+
+            avgDuration: {
+                funcName: "aconite.animationClock.frameCounter.avgDuration",
+                args: ["{that}.model.frameCount", "{that}.frameDurations"]
+            }
         },
 
         listeners: {
-            "{animationClock}.events.onTick": {
-                funcName: "aconite.animationClock.frameCounter.calcFPS",
-                args: ["{that}.dom.fpsCounter", "{that}.options.refreshRate", "{that}.model"],
-                priority: "first"
-            }
+            "{animationClock}.events.onTick": "{that}.recordTime()"
         },
 
         selectors: {
@@ -96,18 +118,35 @@
         }
     });
 
-    aconite.animationClock.frameCounter.calcFPS = function (fpsCounter, refreshRate, m) {
-        var now = performance.now(),
-            rate = 1000 / (now - m.lastTime);
+    aconite.animationClock.frameCounter.initFrameDurations = function (numFrames) {
+        return new Float32Array(numFrames);
+    };
 
-        m.lastTime = now;
-        m.sum += rate;
+    aconite.animationClock.frameCounter.maxDuration = function (frameDurations) {
+        return DSP.max(frameDurations);
+    };
 
-        if (m.frameCount >= refreshRate) {
-            fpsCounter.text(Math.round(m.sum / refreshRate));
-            m.frameCount = m.sum = 0;
+    aconite.animationClock.frameCounter.avgDuration = function (frameCount, frameDurations) {
+        var sum = 0;
+        for (var i = 0; i < frameCount; i++) {
+            sum += frameDurations[i];
         }
 
+        return sum / frameCount;
+    };
+
+    aconite.animationClock.frameCounter.recordTime = function (frameDurations, m) {
+        if (m.lastTime === null) {
+            m.lastTime = performance.now();
+            return;
+        }
+
+        var now = performance.now(),
+            dur = now - m.lastTime;
+
+        frameDurations[m.frameCount] = dur;
+
+        m.lastTime = now;
         m.frameCount++;
     };
 
