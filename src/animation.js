@@ -1,3 +1,13 @@
+/*
+ * Aconite Animation
+ * http://github.com/colinbdclark/aconite
+ *
+ * Copyright 2013-2015, Colin Clark
+ * Distributed under the MIT license.
+ */
+
+/*global fluid, aconite, performance, DSP*/
+
 (function () {
     "use strict";
 
@@ -64,7 +74,7 @@
 
 
     fluid.defaults("aconite.animationClock.frameCounter", {
-        gradeNames: ["fluid.viewRelayComponent", "autoInit"],
+        gradeNames: ["fluid.modelRelayComponent", "autoInit"],
 
         numFrames: 72000, // 20 minutes at 60 fps
 
@@ -101,10 +111,6 @@
 
         listeners: {
             "{animationClock}.events.onTick": "{that}.recordTime()"
-        },
-
-        selectors: {
-            fpsCounter: ".aconite-fps-counter"
         }
     });
 
@@ -240,7 +246,7 @@
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     };
 
-    aconite.animator.makeStageVertex = function (gl, vertexPosition, color) {
+    aconite.animator.makeStageVertex = function (gl, vertexPosition) {
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -286,13 +292,8 @@
 
         components: {
             frameCounter: {
-                type: "aconite.animationClock.frameCounter",
-                container: "{that}.options.selectors.fpsCounter"
+                type: "aconite.animationClock.frameCounter"
             }
-        },
-
-        selectors: {
-            fpsCounter: ".aconite-fps-display"
         }
     });
 

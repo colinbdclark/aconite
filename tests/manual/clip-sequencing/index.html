@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Clip Sequencing Manual Test</title>
+
+        <link rel="stylesheet" href="../../../src/ui/css/stage.css" type="text/css" />
+        <link rel="stylesheet" href="../../../src/ui/css/playButton.css" type="text/css" />
+
+        <script src="../../../node_modules/flocking/dist/flocking-all.js"></script>
+
+        <script src="../../../src/core.js"></script>
+        <script src="../../../src/glComponent.js"></script>
+        <script src="../../../src/video.js"></script>
+        <script src="../../../src/compositables.js"></script>
+        <script src="../../../src/clip-sequencers.js"></script>
+        <script src="../../../src/animation.js"></script>
+        <script src="../../../src/pip.js"></script>
+        <script src="../../../src/ui/js/playButton.js"></script>
+
+        <script src="js/clip-sequencing-manual-test.js"></script>
+
+    </head>
+    <body>
+        <div class="aconite-video-container">
+            <img class="aconite-animator-play" src="../../../src/ui/images/play_overlay.png"></img>
+            <canvas class="aconite-animator-canvas" width="640" height="480" />
+            <div class="aconite-fps-display"></div>
+        </div>
+
+        <script>
+            window.clipSequencingTest = aconite.test.clipSequencingTest(".aconite-video-container");
+        </script>
+    </body>
+</html>

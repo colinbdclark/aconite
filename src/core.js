@@ -1,14 +1,23 @@
+/*
+ * Aconite Core
+ * http://github.com/colinbdclark/aconite
+ *
+ * Copyright 2013-2015, Colin Clark
+ * Distributed under the MIT license.
+ */
+
+/*global fluid, aconite, jQuery*/
+
 (function () {
     "use strict";
 
     fluid.registerNamespace("aconite");
 
-    aconite.setupWebGL = function (canvas, options) {
-        function signalError (msg) {
-            var str = window.WebGLRenderingContext ? OTHER_PROBLEM : GET_A_WEBGL_BROWSER;
-            str += "\nError: " + msg;
+    aconite.setupWebGL = function (canvas) {
+        function signalError(msg) {
+            var str = "\nError: " + msg;
             throw new Error(str);
-        };
+        }
 
         canvas.addEventListener("webglcontextcreationerror", function (e) {
             signalError(e.statusMessage);
@@ -59,11 +68,11 @@
         };
 
         fluid.each(shaderSpecs, function (file, key) {
-            deferreds.push($.ajax({
+            deferreds.push(jQuery.ajax({
                 type: "GET",
                 dataType: "text",
                 url: file,
-                success: function(data) {
+                success: function (data) {
                     try {
                         shaders[key] = aconite.textToShader(gl, data, key);
                     } catch (e) {
@@ -71,13 +80,13 @@
                     }
                 },
 
-                error: function(jqXHR, textStatus, errorThrown) {
+                error: function (jqXHR, textStatus, errorThrown) {
                     handleError(new Error(textStatus + " " + errorThrown), error);
                 }
             }));
         });
 
-        $.when.apply($, deferreds).then(function() {
+        jQuery.when.apply(jQuery, deferreds).then(function () {
             success(shaders);
         });
     };
@@ -159,7 +168,7 @@
         });
     };
 
-    aconite.makeSquareVertexBuffer = function(gl, vertexPosition) {
+    aconite.makeSquareVertexBuffer = function (gl, vertexPosition) {
         var info = {
             vertices: new Float32Array([
                 -1, 1,   1,  1,   1, -1,  // Triangle 1

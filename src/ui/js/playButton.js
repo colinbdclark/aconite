@@ -1,7 +1,15 @@
+/*
+ * Aconite UI Play Button
+ * http://github.com/colinbdclark/aconite
+ *
+ * Copyright 2013-2015, Colin Clark
+ * Distributed under the MIT license.
+ */
+
+/*global fluid, aconite, jQuery*/
+
 (function () {
     "use strict";
-
-    fluid.registerNamespace("aconite.ui");
 
     /***************
      * Play Button *
@@ -89,7 +97,7 @@
     };
 
     aconite.ui.playButtonOverlay.play = function (playButton, onActivated, onPlay, fullScreenSel, playDelay) {
-        var jEl = $(fullScreenSel),
+        var jEl = jQuery(fullScreenSel),
             el = jEl[0],
             rfs = el.webkitRequestFullScreen ? "webkitRequestFullScreen" :
                 el.mozRequestFullScreen ? "mozRequestFullScreen" : "requestFullScreen";
@@ -102,7 +110,7 @@
     };
 
     aconite.ui.playButtonOverlay.toggleCursor = function (fullScreenSel, styles) {
-        var el = $(fullScreenSel);
+        var el = jQuery(fullScreenSel);
         el.toggleClass(styles.fullScreen);
     };
 

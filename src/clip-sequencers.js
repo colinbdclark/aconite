@@ -1,3 +1,13 @@
+/*
+ * Aconite Clip Sequencers
+ * http://github.com/colinbdclark/aconite
+ *
+ * Copyright 2013-2015, Colin Clark
+ * Distributed under the MIT license.
+ */
+
+/*global fluid, aconite, jQuery*/
+
 (function () {
     "use strict";
 
@@ -103,6 +113,15 @@
         var inSecs = aconite.video.parseTimecode(clip.inTime),
             outSecs = aconite.video.parseTimecode(clip.outTime);
 
+        if (inSecs === undefined) {
+            inSecs = 0;
+        }
+
+        if (outSecs === undefined) {
+            fluid.fail("A clip was found with no duration or outTime. Please specify one. Clip: " +
+                fluid.prettyPrintJSON(clip));
+        }
+
         return outSecs - inSecs;
     };
 
@@ -142,7 +161,7 @@
     aconite.clipSequencer.mergeClipParams = function (clipSequence, defaultParams) {
         return fluid.transform(clipSequence, function (clip) {
             var defaults = defaultParams[clip.url];
-            return $.extend(true, clip, defaults);
+            return jQuery.extend(true, clip, defaults);
         });
     };
 
