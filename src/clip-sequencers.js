@@ -113,6 +113,15 @@
         var inSecs = aconite.video.parseTimecode(clip.inTime),
             outSecs = aconite.video.parseTimecode(clip.outTime);
 
+        if (inSecs === undefined) {
+            inSecs = 0;
+        }
+
+        if (outSecs === undefined) {
+            fluid.fail("A clip was found with no duration or outTime. Please specify one. Clip: " +
+                fluid.prettyPrintJSON(clip));
+        }
+
         return outSecs - inSecs;
     };
 

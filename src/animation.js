@@ -6,7 +6,7 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, performance*/
+/*global fluid, aconite, performance, DSP*/
 
 (function () {
     "use strict";
@@ -74,7 +74,7 @@
 
 
     fluid.defaults("aconite.animationClock.frameCounter", {
-        gradeNames: ["fluid.viewRelayComponent", "autoInit"],
+        gradeNames: ["fluid.modelRelayComponent", "autoInit"],
 
         numFrames: 72000, // 20 minutes at 60 fps
 
@@ -111,10 +111,6 @@
 
         listeners: {
             "{animationClock}.events.onTick": "{that}.recordTime()"
-        },
-
-        selectors: {
-            fpsCounter: ".aconite-fps-counter"
         }
     });
 
@@ -296,13 +292,8 @@
 
         components: {
             frameCounter: {
-                type: "aconite.animationClock.frameCounter",
-                container: "{that}.options.selectors.fpsCounter"
+                type: "aconite.animationClock.frameCounter"
             }
-        },
-
-        selectors: {
-            fpsCounter: ".aconite-fps-display"
         }
     });
 
