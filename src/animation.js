@@ -6,147 +6,10 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, performance, DSP*/
+/*global fluid, aconite*/
 
 (function () {
     "use strict";
-
-    fluid.registerNamespace("aconite");
-
-    // TODO: Replace this with Bergson's rafClock.
-    fluid.defaults("aconite.animationClock", {
-        gradeNames: "fluid.modelComponent",
-
-        model: {
-            active: false
-        },
-
-        members: {
-            raf: window.requestAnimationFrame || window.webkitRequestAnimationFrame
-        },
-
-        invokers: {
-            start: {
-                func: "{that}.applier.change",
-                args: ["active", true]
-            },
-
-            stop: {
-                func: "{that}.applier.change",
-                args: ["active", false]
-            },
-
-            tick: {
-                funcName: "aconite.animationClock.tick",
-                args: ["{that}.model", "{that}.events.onNextFrame.fire"]
-            },
-
-            scheduleNextTick: {
-                func: "{that}.raf",
-                args: ["{that}.events.onTick.fire"]
-            }
-        },
-
-        events: {
-            onTick: null,
-            onNextFrame: null
-        },
-
-        listeners: {
-            onTick: [
-                "{that}.tick()"
-            ],
-
-            onNextFrame: [
-                "{that}.scheduleNextTick()"
-            ]
-        },
-
-        modelListeners: {
-            "active": "{that}.events.onTick.fire()"
-        }
-    });
-
-    aconite.animationClock.tick = function (m, onNextFrame) {
-        if (m.active) {
-            onNextFrame();
-        }
-    };
-
-
-    fluid.defaults("aconite.animationClock.frameCounter", {
-        gradeNames: "fluid.modelComponent",
-
-        numFrames: 72000, // 20 minutes at 60 fps
-
-        members: {
-            frameDurations: {
-                expander: {
-                    funcName: "aconite.animationClock.frameCounter.initFrameDurations",
-                    args: ["{that}.options.numFrames"]
-                }
-            }
-        },
-
-        model: {
-            lastTime: null,
-            frameCount: 0
-        },
-
-        invokers: {
-            recordTime: {
-                funcName: "aconite.animationClock.frameCounter.recordTime",
-                args: [ "{that}.frameDurations", "{that}.model"]
-            },
-
-            maxDuration: {
-                funcName: "aconite.animationClock.frameCounter.maxDuration",
-                args: ["{that}.frameDurations"]
-            },
-
-            avgDuration: {
-                funcName: "aconite.animationClock.frameCounter.avgDuration",
-                args: ["{that}.model.frameCount", "{that}.frameDurations"]
-            }
-        },
-
-        listeners: {
-            "{animationClock}.events.onTick": "{that}.recordTime()"
-        }
-    });
-
-    aconite.animationClock.frameCounter.initFrameDurations = function (numFrames) {
-        return new Float32Array(numFrames);
-    };
-
-    aconite.animationClock.frameCounter.maxDuration = function (frameDurations) {
-        return DSP.max(frameDurations);
-    };
-
-    aconite.animationClock.frameCounter.avgDuration = function (frameCount, frameDurations) {
-        var sum = 0;
-        for (var i = 0; i < frameCount; i++) {
-            sum += frameDurations[i];
-        }
-
-        return sum / frameCount;
-    };
-
-    aconite.animationClock.frameCounter.recordTime = function (frameDurations, m) {
-        if (m.lastTime === null) {
-            m.lastTime = performance.now();
-            return;
-        }
-
-        var now = performance.now(),
-            dur = now - m.lastTime;
-
-        frameDurations[m.frameCount] = dur;
-
-        m.lastTime = now;
-        m.frameCount++;
-    };
-
 
     fluid.defaults("aconite.animator", {
         gradeNames: "fluid.viewComponent",
@@ -192,7 +55,7 @@
                 type: "aconite.animationClock",
                 options: {
                     listeners: {
-                        onNextFrame: "{animator}.drawFrame"
+                        onTick: "{animator}.drawFrame"
                     }
                 }
             },

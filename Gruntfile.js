@@ -8,22 +8,38 @@ module.exports = function(grunt) {
             "third-party/jquery/js/jquery.js"
         ],
 
+        // TODO: Source Infusion directly from npm
         infusion: [
-            "third-party/infusion/js/Fluid.js",
-            "third-party/infusion/js/FluidDebugging.js",
-            "third-party/infusion/js/FluidIoC.js",
-            "third-party/infusion/js/DataBinding.js",
-            "third-party/infusion/js/FluidDOM.js",
-            "third-party/infusion/js/ModelTransformation.js",
-            "third-party/infusion/js/ModelTransformationTransforms.js",
-            "third-party/infusion/js/FluidDocument.js",
-            "third-party/infusion/js/FluidDOMUtilities.js",
-            "third-party/infusion/js/FluidView.js"
+            "node_modules/flocking/node_modules/infusion/src/framework/core/js/Fluid.js",
+            "node_modules/flocking/node_modules/infusion/src/framework/core/js/FluidDebugging.js",
+            "node_modules/flocking/node_modules/infusion/src/framework/core/js/FluidIoC.js",
+            "node_modules/flocking/node_modules/infusion/src/framework/core/js/DataBinding.js",
+            "node_modules/flocking/node_modules/infusion/src/framework/core/js/FluidDOM.js",
+            "node_modules/flocking/node_modules/infusion/src/framework/core/js/ModelTransformation.js",
+            "node_modules/flocking/node_modules/infusion/src/framework/core/js/ModelTransformationTransforms.js",
+            "node_modules/flocking/node_modules/infusion/src/framework/core/js/FluidDocument.js",
+            "node_modules/flocking/node_modules/infusion/src/framework/core/js/FluidDOMUtilities.js",
+            "node_modules/flocking/node_modules/infusion/src/framework/core/js/FluidView.js",
+            "node_modules/flocking/node_modules/infusion/src/framework/enhancement/js/ContextAwareness.js"
+        ],
+
+        bergson: [
+            "node_modules/bergson/src/js/clock.js",
+            "node_modules/bergson/src/js/raf-clock.js",
+            "node_modules/bergson/src/js/priority-queue.js",
+            "node_modules/bergson/src/js/scheduler.js"
+        ],
+
+        flocking: [
+            "node_modules/flocking/dist/flocking-base.js",
+            "node_modules/flocking/src/ugens/oscillators.js",
+            "node_modules/flocking/src/ugens/envelopes.js"
         ],
 
         aconite: [
             "src/core.js",
             "src/glComponent.js",
+            "src/animation-clock.js",
             "src/animation.js",
             "src/video.js",
             "src/video-player.js",
@@ -57,7 +73,13 @@ module.exports = function(grunt) {
             },
 
             all: {
-                src: [].concat(files.jQuery, files.infusion, files.aconite),
+                src: [].concat(
+                    files.jQuery,
+                    files.infusion,
+                    files.bergson,
+                    files.flocking,
+                    files.aconite
+                ),
                 dest: "dist/<%= pkg.name %>-all.js"
             },
 

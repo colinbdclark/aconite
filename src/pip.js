@@ -45,7 +45,7 @@
         },
 
         events: {
-            onNextFrame: "{pipClock}.events.onNextFrame",
+            onTick: "{pipClock}.events.onTick",
             onPlay: "{videoCompositor}.events.onStart",
             onPip: null,
             afterPip: null
@@ -61,7 +61,7 @@
                 "{pipClock}.start()"
             ],
 
-            onNextFrame: [
+            onTick: [
                 "{that}.countFrames()"
             ],
 
