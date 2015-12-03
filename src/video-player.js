@@ -18,7 +18,7 @@
      * with real time.
      */
     fluid.defaults("aconite.videoPlayer", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: "fluid.modelComponent",
 
         members: {
             previousTime: "{clock}.time",
@@ -124,7 +124,7 @@
      * An offline VideoPlayer driven by an external clock.
      */
     fluid.defaults("aconite.offlineVideoPlayer", {
-        gradeNames: ["aconite.videoPlayer", "autoInit"],
+        gradeNames: "aconite.videoPlayer",
 
         invokers: {
             tick: {

@@ -14,7 +14,7 @@
     fluid.registerNamespace("aconite");
 
     fluid.defaults("aconite.fcpxmlParser", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
+        gradeNames: "fluid.component",
 
         members: {
             xml: {

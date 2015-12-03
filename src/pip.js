@@ -12,7 +12,7 @@
     "use strict";
 
     fluid.defaults("aconite.pip", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: "fluid.modelComponent",
 
         pipOnFrame: 120,
 
@@ -107,7 +107,7 @@
     };
 
     fluid.defaults("aconite.pip.synth", {
-        gradeNames: ["flock.synth", "autoInit"],
+        gradeNames: "flock.synth",
 
         synthDef: {
             ugen: "flock.ugen.sin",

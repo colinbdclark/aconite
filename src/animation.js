@@ -13,8 +13,9 @@
 
     fluid.registerNamespace("aconite");
 
+    // TODO: Replace this with Bergson's rafClock.
     fluid.defaults("aconite.animationClock", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: "fluid.modelComponent",
 
         model: {
             active: false
@@ -74,7 +75,7 @@
 
 
     fluid.defaults("aconite.animationClock.frameCounter", {
-        gradeNames: ["fluid.modelRelayComponent", "autoInit"],
+        gradeNames: "fluid.modelComponent",
 
         numFrames: 72000, // 20 minutes at 60 fps
 
@@ -148,10 +149,12 @@
 
 
     fluid.defaults("aconite.animator", {
-        gradeNames: ["fluid.viewRelayComponent", "autoInit"],
+        gradeNames: "fluid.viewComponent",
 
+        // TODO: Replace this with model relay.
         uniformModelMap: {},  // Uniform name : model path
 
+        // TODO: Factor stage-related behaviour into a separate component.
         stageBackgroundColor: {
             r: 0.0,
             g: 0.0,
@@ -160,8 +163,12 @@
         },
 
         invokers: {
+            // TODO: Determine whether this invoker is
+            // actually used by any clients. If not, remove it.
             updateModel: "fluid.identity()",
 
+            // TODO: Determine whether this invoker is
+            // actually used by any clients. If not, remove it.
             render: "fluid.identity()",
 
             drawFrame: {
@@ -253,6 +260,9 @@
         aconite.makeSquareVertexBuffer(gl, vertexPosition);
     };
 
+    // This should be bound as a model listener for a component
+    // whose entire model consists of mappings to uniforms.
+    // perhaps a "shader program" component?
     aconite.animator.setFrameRateUniforms = function (model, glRenderer, uniformModelMap) {
         for (var name in uniformModelMap) {
             var modelPath = uniformModelMap[name],
@@ -274,7 +284,7 @@
 
 
     fluid.defaults("aconite.animator.playable", {
-        gradeNames: ["aconite.animator", "autoInit"],
+        gradeNames: "aconite.animator",
 
         components: {
             playButton: {
@@ -288,7 +298,7 @@
     });
 
     fluid.defaults("aconite.animator.debugging", {
-        gradeNames: ["aconite.animator", "autoInit"],
+        gradeNames: "aconite.animator",
 
         components: {
             frameCounter: {
@@ -300,7 +310,7 @@
 
     // TODO: Generalize this to an arbitrary number of layers.
     fluid.defaults("aconite.videoCompositor", {
-        gradeNames: ["aconite.animator", "autoInit"],
+        gradeNames: "aconite.animator",
 
         invokers: {
             render: "aconite.videoCompositor.refreshLayers({top}, {bottom})"
@@ -359,6 +369,7 @@
     });
 
     // TODO: Naming both for this functions and its callees.
+    // TODO: This should simply be an event.
     aconite.videoCompositor.refreshLayers = function (top, bottom) {
         top.refresh();
         bottom.refresh();
@@ -366,7 +377,7 @@
 
 
     fluid.defaults("aconite.videoCompositor.glRenderer", {
-        gradeNames: ["aconite.glComponent", "autoInit"],
+        gradeNames: "aconite.glComponent",
 
         // TODO: Factor these URLs that they can be
         // correctly relative to the user's project
@@ -393,23 +404,24 @@
             textureSize: {
                 type: "f",
                 value: [
-                    "{videoCompositor}.dom.stage.0.width", "{videoCompositor}.dom.stage.0.height"
+                    "{videoCompositor}.dom.stage.0.width",
+                    "{videoCompositor}.dom.stage.0.height"
                 ]
             }
         }
 
     });
     fluid.defaults("aconite.videoCompositor.topLayer", {
-        gradeNames: ["aconite.compositableVideo.layer", "autoInit"]
+        gradeNames: "aconite.compositableVideo.layer"
     });
 
     fluid.defaults("aconite.videoCompositor.bottomLayer", {
-        gradeNames: ["aconite.compositableVideo.layer", "autoInit"],
+        gradeNames: "aconite.compositableVideo.layer",
         bindToTextureUnit: "TEXTURE1"
     });
 
     fluid.defaults("aconite.videoSequenceCompositor", {
-        gradeNames: ["aconite.videoCompositor", "autoInit"],
+        gradeNames: "aconite.videoCompositor",
 
         components: {
             // User-specifiable.

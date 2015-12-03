@@ -16,7 +16,7 @@
      ***************/
 
     fluid.defaults("aconite.ui.playButtonOverlay", {
-        gradeNames: ["fluid.viewRelayComponent", "autoInit"],
+        gradeNames: "fluid.viewComponent",
 
         playDelay: 10,
 

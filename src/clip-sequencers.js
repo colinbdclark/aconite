@@ -17,7 +17,7 @@
      * Sequences the playback of a colection of clips described by the "clipSequence" option
      */
     fluid.defaults("aconite.clipSequencer", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: "fluid.modelComponent",
 
         model: {
             clipIdx: 0,
@@ -166,7 +166,7 @@
     };
 
     fluid.defaults("aconite.clipSequencer.static", {
-        gradeNames: ["aconite.clipSequencer", "autoInit"],
+        gradeNames: "aconite.clipSequencer",
 
         listeners: {
             onCreate: {
@@ -176,7 +176,7 @@
     });
 
     fluid.defaults("aconite.clipSequencer.fcpxml", {
-        gradeNames: ["aconite.clipSequencer", "autoInit"],
+        gradeNames: "aconite.clipSequencer",
 
         components: {
             parser: {
@@ -195,7 +195,7 @@
     });
 
     fluid.defaults("aconite.clipSequencer.clipMerger", {
-        gradeNames: ["aconite.clipSequencer"],
+        gradeNames: "aconite.clipSequencer",
 
         listeners: {
             onSequenceReady: [

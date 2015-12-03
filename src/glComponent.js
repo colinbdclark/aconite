@@ -14,14 +14,22 @@
     fluid.registerNamespace("aconite");
 
     fluid.defaults("aconite.glComponent", {
-        gradeNames: ["fluid.viewRelayComponent", "autoInit"],
+        gradeNames: "fluid.viewComponent",
 
         shaders: {},                                // User specified.
         uniforms: {},                               // User specified.
         attributes: {},                             // User specified.
 
         members: {
-            gl: "@expand:aconite.glComponent.createGL({that}, {that}.container, {that}.events.onGLReady.fire)"
+            gl: {
+                expander: {
+                    funcName: "aconite.glComponent.createGL",
+                    args: ["{that}", "{that}.container", "{that}.events.onGLReady.fire"]
+                }
+            },
+
+            shaderProgram: null // TODO: Currently assigned by that-bashing
+                                // during onCreate. Fix this.
         },
 
         listeners: {

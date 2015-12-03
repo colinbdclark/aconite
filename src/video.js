@@ -12,7 +12,7 @@
     "use strict";
 
     fluid.defaults("aconite.video", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: "fluid.modelComponent",
 
         model: {
             inTime: null,
@@ -24,7 +24,7 @@
         members: {
             element: {
                 expander: {
-                    funcName: "aconite.video.setupVideo",
+                    funcName: "aconite.video.renderVideoElement",
                     args: ["{that}", "{that}.model"]
                 }
             }
@@ -50,7 +50,11 @@
         },
 
         modelListeners: {
-            "*": "aconite.video.updateVideoURL({that})"
+            "*": {
+                funcName: "aconite.video.updateVideoURL",
+                args: ["{that}.element", "{that}.model"],
+                excludeSource: "init"
+            }
         },
 
         events: {
@@ -82,13 +86,17 @@
         return model.url + timeFrag;
     };
 
-    aconite.video.renderVideo = function (that, model) {
+    aconite.video.renderVideoElement = function (that, model) {
         var url = aconite.video.composeURL(model),
             videoHTML = fluid.stringTemplate(that.options.templates.video, {
             url: url
         });
 
         var video = jQuery(videoHTML);
+
+        video.one("canplay", function () {
+            that.events.onReady.fire(that);
+        });
 
         video.bind("canplay", function () {
             that.events.onVideoLoaded.fire(video);
@@ -101,23 +109,8 @@
         return video[0];
     };
 
-    aconite.video.setupVideo = function (that, url) {
-        var video = aconite.video.renderVideo(that, url);
-
-        var once = function () {
-            that.events.onReady.fire(that);
-            video.removeEventListener("canplay", once, true);
-        };
-
-        video.addEventListener("canplay", once, true);
-
-        return video;
-    };
-
-    // TODO: Properly modelize this.
-    aconite.video.updateVideoURL = function (that) {
-        that.element.src = aconite.video.composeURL(that.model);
-        return that.element;
+    aconite.video.updateVideoURL = function (element, model) {
+        element.src = aconite.video.composeURL(model);
     };
 
     aconite.video.isReady = function (that, videoEl) {
