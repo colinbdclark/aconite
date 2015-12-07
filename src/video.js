@@ -31,16 +31,6 @@
         },
 
         invokers: {
-            play: {
-                "this": "{that}.element",
-                method: "play"
-            },
-
-            pause: {
-                "this": "{that}.element",
-                method: "pause"
-            },
-
             setURL: "{that}.applier.change(url, {arguments}.0)",
 
             isReady: {
@@ -174,5 +164,4 @@
         var url = clip.url + aconite.video.createTimeFragment(clip);
         vid.setURL(url);
     };
-
 }());

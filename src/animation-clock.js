@@ -6,7 +6,7 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, performance, DSP*/
+/*global fluid, aconite, DSP*/
 
 (function () {
     "use strict";
@@ -17,75 +17,31 @@
 
 
     fluid.defaults("aconite.animationClock.frameCounter", {
-        gradeNames: "fluid.modelComponent",
-
-        numFrames: 72000, // 20 minutes at 60 fps
-
-        members: {
-            frameDurations: {
-                expander: {
-                    funcName: "aconite.animationClock.frameCounter.initFrameDurations",
-                    args: ["{that}.options.numFrames"]
-                }
-            }
-        },
-
-        model: {
-            lastTime: null,
-            frameCount: 0
-        },
+        gradeNames: "berg.clock.logger",
 
         invokers: {
-            recordTime: {
-                funcName: "aconite.animationClock.frameCounter.recordTime",
-                args: [ "{that}.frameDurations", "{that}.model"]
-            },
-
             maxDuration: {
                 funcName: "aconite.animationClock.frameCounter.maxDuration",
-                args: ["{that}.frameDurations"]
+                args: ["{that}.intervalLog"]
             },
 
             avgDuration: {
                 funcName: "aconite.animationClock.frameCounter.avgDuration",
-                args: ["{that}.model.frameCount", "{that}.frameDurations"]
+                args: ["{that}.model.frameCount", "{that}.intervalLog"]
             }
-        },
-
-        listeners: {
-            "{animationClock}.events.onTick": "{that}.recordTime()"
         }
     });
 
-    aconite.animationClock.frameCounter.initFrameDurations = function (numFrames) {
-        return new Float32Array(numFrames);
+    aconite.animationClock.frameCounter.maxDuration = function (intervalLog) {
+        return DSP.max(intervalLog);
     };
 
-    aconite.animationClock.frameCounter.maxDuration = function (frameDurations) {
-        return DSP.max(frameDurations);
-    };
-
-    aconite.animationClock.frameCounter.avgDuration = function (frameCount, frameDurations) {
+    aconite.animationClock.frameCounter.avgDuration = function (frameCount, intervalLog) {
         var sum = 0;
         for (var i = 0; i < frameCount; i++) {
-            sum += frameDurations[i];
+            sum += intervalLog[i];
         }
 
         return sum / frameCount;
-    };
-
-    aconite.animationClock.frameCounter.recordTime = function (frameDurations, m) {
-        if (m.lastTime === null) {
-            m.lastTime = performance.now();
-            return;
-        }
-
-        var now = performance.now(),
-            dur = now - m.lastTime;
-
-        frameDurations[m.frameCount] = dur;
-
-        m.lastTime = now;
-        m.frameCount++;
     };
 }());

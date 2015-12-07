@@ -315,8 +315,8 @@
         events: {
             onVideosReady: {
                 events: {
-                    topReady: "{top}.preRoller.events.onReady",
-                    bottomReady: "{bottom}.preRoller.events.onReady"
+                    topReady: "{top}.preroller.events.onReady",
+                    bottomReady: "{bottom}.preroller.events.onReady"
                 },
                 args: ["{arguments}.topReady.0", "{arguments}.bottomReady.0"]
             }

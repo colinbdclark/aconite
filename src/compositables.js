@@ -95,13 +95,22 @@
         gradeNames: "aconite.compositable",
 
         invokers: {
-            play: "{that}.source.play()",
-            pause: "{that}.source.pause()"
+            play: "{that}.sourcePlayer.play()",
+            pause: "{that}.sourcePlayer.pause()"
         },
 
         components: {
             source: {
                 type: "aconite.video"
+            },
+
+            sourcePlayer: {
+                type: "aconite.videoPlayer.nativeElement",
+                options: {
+                    components: {
+                        video: "{compositableVideo}.source"
+                    }
+                }
             }
         }
     });

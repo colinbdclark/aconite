@@ -5,26 +5,26 @@ module.exports = function(grunt) {
 
     var files = {
         jQuery: [
-            "third-party/jquery/js/jquery.js"
+            "node_modules/infusion/src/lib/jquery/core/js/jquery.js"
         ],
 
-        // TODO: Source Infusion directly from npm
         infusion: [
-            "node_modules/flocking/node_modules/infusion/src/framework/core/js/Fluid.js",
-            "node_modules/flocking/node_modules/infusion/src/framework/core/js/FluidDebugging.js",
-            "node_modules/flocking/node_modules/infusion/src/framework/core/js/FluidIoC.js",
-            "node_modules/flocking/node_modules/infusion/src/framework/core/js/DataBinding.js",
-            "node_modules/flocking/node_modules/infusion/src/framework/core/js/FluidDOM.js",
-            "node_modules/flocking/node_modules/infusion/src/framework/core/js/ModelTransformation.js",
-            "node_modules/flocking/node_modules/infusion/src/framework/core/js/ModelTransformationTransforms.js",
-            "node_modules/flocking/node_modules/infusion/src/framework/core/js/FluidDocument.js",
-            "node_modules/flocking/node_modules/infusion/src/framework/core/js/FluidDOMUtilities.js",
-            "node_modules/flocking/node_modules/infusion/src/framework/core/js/FluidView.js",
-            "node_modules/flocking/node_modules/infusion/src/framework/enhancement/js/ContextAwareness.js"
+            "node_modules/infusion/src/framework/core/js/Fluid.js",
+            "node_modules/infusion/src/framework/core/js/FluidDebugging.js",
+            "node_modules/infusion/src/framework/core/js/FluidIoC.js",
+            "node_modules/infusion/src/framework/core/js/DataBinding.js",
+            "node_modules/infusion/src/framework/core/js/FluidDOM.js",
+            "node_modules/infusion/src/framework/core/js/ModelTransformation.js",
+            "node_modules/infusion/src/framework/core/js/ModelTransformationTransforms.js",
+            "node_modules/infusion/src/framework/core/js/FluidDocument.js",
+            "node_modules/infusion/src/framework/core/js/FluidDOMUtilities.js",
+            "node_modules/infusion/src/framework/core/js/FluidView.js",
+            "node_modules/infusion/src/framework/enhancement/js/ContextAwareness.js"
         ],
 
         bergson: [
             "node_modules/bergson/src/js/clock.js",
+            "node_modules/bergson/src/js/clock-logger.js",
             "node_modules/bergson/src/js/raf-clock.js",
             "node_modules/bergson/src/js/priority-queue.js",
             "node_modules/bergson/src/js/scheduler.js"
@@ -58,8 +58,7 @@ module.exports = function(grunt) {
         jshint: {
             all: [
                 "src/**/*.js",
-                "tests/**/*js",
-                "!**/third-party/**"
+                "tests/**/*js"
             ],
             options: {
                 jshintrc: true
@@ -117,7 +116,7 @@ module.exports = function(grunt) {
 
         watch: {
             scripts: {
-                files: ["src/**/*.js", "third-party/**/*.js", "Gruntfile.js"],
+                files: ["src/**/*.js", "node_modules/**/*.js", "Gruntfile.js"],
                 tasks: ["default"],
                 options: {
                     spawn: false
