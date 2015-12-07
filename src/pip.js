@@ -12,7 +12,7 @@
     "use strict";
 
     fluid.defaults("aconite.pip", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: "fluid.modelComponent",
 
         pipOnFrame: 120,
 
@@ -45,7 +45,7 @@
         },
 
         events: {
-            onNextFrame: "{pipClock}.events.onNextFrame",
+            onTick: "{pipClock}.events.onTick",
             onPlay: "{videoCompositor}.events.onStart",
             onPip: null,
             afterPip: null
@@ -61,7 +61,7 @@
                 "{pipClock}.start()"
             ],
 
-            onNextFrame: [
+            onTick: [
                 "{that}.countFrames()"
             ],
 
@@ -107,7 +107,7 @@
     };
 
     fluid.defaults("aconite.pip.synth", {
-        gradeNames: ["flock.synth", "autoInit"],
+        gradeNames: "flock.synth",
 
         synthDef: {
             ugen: "flock.ugen.sin",

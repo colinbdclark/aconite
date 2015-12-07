@@ -17,7 +17,7 @@
      * Sequences the playback of a colection of clips described by the "clipSequence" option
      */
     fluid.defaults("aconite.clipSequencer", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: "fluid.modelComponent",
 
         model: {
             clipIdx: 0,
@@ -37,7 +37,7 @@
 
             layer: {},
 
-            preRoller: {
+            preroller: {
                 type: "aconite.video"
             }
         },
@@ -65,22 +65,24 @@
         loop: false
     });
 
-    aconite.clipSequencer.swapClips = function (source, preRoller, inTime) {
-        var displayEl = source.element,
-            preRollEl = preRoller.element,
-            parsed = aconite.video.parseTimecode(inTime);
+    aconite.clipSequencer.swapClips = function (sourcePlayer, preroller, inTime) {
+        var displayEl = sourcePlayer.video.element,
+            preRollEl = preroller.element;
 
+        // TODO: This should be done by mutating the video component's model
+        // not by direct property modifications.
+        var parsed = aconite.video.parseTimecode(inTime);
         preRollEl.currentTime = parsed === undefined ? 0 : parsed;
-        preRollEl.play();
-        displayEl.pause();
 
-        source.element = preRollEl;
-        preRoller.element = displayEl;
+        sourcePlayer.video.element = preRollEl;
+        preroller.element = displayEl;
+
+        sourcePlayer.play();
     };
 
-    aconite.clipSequencer.displayClip = function (layer, clip, clipIdx, preRoller, onNextClip) {
+    aconite.clipSequencer.displayClip = function (layer, clip, clipIdx, preroller, onNextClip) {
         onNextClip.fire(clip, clipIdx);
-        aconite.clipSequencer.swapClips(layer.source, preRoller, clip.inTime);
+        aconite.clipSequencer.swapClips(layer.sourcePlayer, preroller, clip.inTime);
     };
 
     aconite.clipSequencer.nextClip = function (m, loop) {
@@ -100,7 +102,7 @@
     aconite.clipSequencer.scheduleClipDisplay = function (atTime, nextClip, that) {
         that.scheduler.once(atTime, function () {
             that.model.clipIdx++;
-            aconite.clipSequencer.displayClip(that.layer, nextClip, that.model.clipIdx, that.preRoller, that.events.onNextClip);
+            aconite.clipSequencer.displayClip(that.layer, nextClip, that.model.clipIdx, that.preroller, that.events.onNextClip);
             aconite.clipSequencer.scheduleNextClip(that);
         });
     };
@@ -147,13 +149,13 @@
             return;
         }
 
-        aconite.video.assignClip(that.preRoller, nextClip);
+        aconite.video.assignClip(that.preroller, nextClip);
         aconite.clipSequencer.scheduleClipDisplay(currentClip.duration, nextClip, that);
     };
 
     aconite.clipSequencer.prepareForPlay = function (that) {
         var firstClip = that.model.clipSequence[0];
-        aconite.video.assignClip(that.preRoller, firstClip);
+        aconite.video.assignClip(that.preroller, firstClip);
         aconite.video.assignClip(that.layer.source, firstClip);
         that.events.onNextClip.fire(firstClip, 0);
     };
@@ -166,7 +168,7 @@
     };
 
     fluid.defaults("aconite.clipSequencer.static", {
-        gradeNames: ["aconite.clipSequencer", "autoInit"],
+        gradeNames: "aconite.clipSequencer",
 
         listeners: {
             onCreate: {
@@ -176,7 +178,7 @@
     });
 
     fluid.defaults("aconite.clipSequencer.fcpxml", {
-        gradeNames: ["aconite.clipSequencer", "autoInit"],
+        gradeNames: "aconite.clipSequencer",
 
         components: {
             parser: {
@@ -195,7 +197,7 @@
     });
 
     fluid.defaults("aconite.clipSequencer.clipMerger", {
-        gradeNames: ["aconite.clipSequencer"],
+        gradeNames: "aconite.clipSequencer",
 
         listeners: {
             onSequenceReady: [

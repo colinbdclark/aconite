@@ -5,10 +5,9 @@
 
     fluid.defaults("aconite.test.clipSequencingTest", {
         gradeNames: [
-            "aconite.videoSequenceCompositor",
             "aconite.animator.playable",
             "aconite.animator.debugging",
-            "autoInit"
+            "aconite.videoSequenceCompositor"
         ],
 
         uniformModelMap: {},
@@ -39,7 +38,7 @@
     });
 
     fluid.defaults("aconite.test.clipSequencingTest.topSequencer", {
-        gradeNames: ["aconite.clipSequencer.static", "autoInit"],
+        gradeNames: "aconite.clipSequencer.static",
 
         model: {
             clipSequence: [
@@ -74,7 +73,7 @@
     });
 
     fluid.defaults("aconite.test.clipSequencingTest.bottomSequencer", {
-        gradeNames: ["aconite.clipSequencer.static", "autoInit"],
+        gradeNames: "aconite.clipSequencer.static",
 
         model: {
             clipSequence: [
@@ -93,7 +92,7 @@
     });
 
     fluid.defaults("aconite.test.clipSequencingTest.glRenderer", {
-        gradeNames: ["aconite.videoCompositor.glRenderer", "autoInit"],
+        gradeNames: "aconite.videoCompositor.glRenderer",
 
         shaders: {
             fragment: "../../../src/shaders/readTopLayerFragmentShader.frag",

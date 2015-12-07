@@ -6,152 +6,18 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, performance, DSP*/
+/*global fluid, aconite*/
 
 (function () {
     "use strict";
 
-    fluid.registerNamespace("aconite");
-
-    fluid.defaults("aconite.animationClock", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
-
-        model: {
-            active: false
-        },
-
-        members: {
-            raf: window.requestAnimationFrame || window.webkitRequestAnimationFrame
-        },
-
-        invokers: {
-            start: {
-                func: "{that}.applier.change",
-                args: ["active", true]
-            },
-
-            stop: {
-                func: "{that}.applier.change",
-                args: ["active", false]
-            },
-
-            tick: {
-                funcName: "aconite.animationClock.tick",
-                args: ["{that}.model", "{that}.events.onNextFrame.fire"]
-            },
-
-            scheduleNextTick: {
-                func: "{that}.raf",
-                args: ["{that}.events.onTick.fire"]
-            }
-        },
-
-        events: {
-            onTick: null,
-            onNextFrame: null
-        },
-
-        listeners: {
-            onTick: [
-                "{that}.tick()"
-            ],
-
-            onNextFrame: [
-                "{that}.scheduleNextTick()"
-            ]
-        },
-
-        modelListeners: {
-            "active": "{that}.events.onTick.fire()"
-        }
-    });
-
-    aconite.animationClock.tick = function (m, onNextFrame) {
-        if (m.active) {
-            onNextFrame();
-        }
-    };
-
-
-    fluid.defaults("aconite.animationClock.frameCounter", {
-        gradeNames: ["fluid.modelRelayComponent", "autoInit"],
-
-        numFrames: 72000, // 20 minutes at 60 fps
-
-        members: {
-            frameDurations: {
-                expander: {
-                    funcName: "aconite.animationClock.frameCounter.initFrameDurations",
-                    args: ["{that}.options.numFrames"]
-                }
-            }
-        },
-
-        model: {
-            lastTime: null,
-            frameCount: 0
-        },
-
-        invokers: {
-            recordTime: {
-                funcName: "aconite.animationClock.frameCounter.recordTime",
-                args: [ "{that}.frameDurations", "{that}.model"]
-            },
-
-            maxDuration: {
-                funcName: "aconite.animationClock.frameCounter.maxDuration",
-                args: ["{that}.frameDurations"]
-            },
-
-            avgDuration: {
-                funcName: "aconite.animationClock.frameCounter.avgDuration",
-                args: ["{that}.model.frameCount", "{that}.frameDurations"]
-            }
-        },
-
-        listeners: {
-            "{animationClock}.events.onTick": "{that}.recordTime()"
-        }
-    });
-
-    aconite.animationClock.frameCounter.initFrameDurations = function (numFrames) {
-        return new Float32Array(numFrames);
-    };
-
-    aconite.animationClock.frameCounter.maxDuration = function (frameDurations) {
-        return DSP.max(frameDurations);
-    };
-
-    aconite.animationClock.frameCounter.avgDuration = function (frameCount, frameDurations) {
-        var sum = 0;
-        for (var i = 0; i < frameCount; i++) {
-            sum += frameDurations[i];
-        }
-
-        return sum / frameCount;
-    };
-
-    aconite.animationClock.frameCounter.recordTime = function (frameDurations, m) {
-        if (m.lastTime === null) {
-            m.lastTime = performance.now();
-            return;
-        }
-
-        var now = performance.now(),
-            dur = now - m.lastTime;
-
-        frameDurations[m.frameCount] = dur;
-
-        m.lastTime = now;
-        m.frameCount++;
-    };
-
-
     fluid.defaults("aconite.animator", {
-        gradeNames: ["fluid.viewRelayComponent", "autoInit"],
+        gradeNames: "fluid.viewComponent",
 
+        // TODO: Replace this with model relay.
         uniformModelMap: {},  // Uniform name : model path
 
+        // TODO: Factor stage-related behaviour into a separate component.
         stageBackgroundColor: {
             r: 0.0,
             g: 0.0,
@@ -160,8 +26,12 @@
         },
 
         invokers: {
+            // TODO: Determine whether this invoker is
+            // actually used by any clients. If not, remove it.
             updateModel: "fluid.identity()",
 
+            // TODO: Determine whether this invoker is
+            // actually used by any clients. If not, remove it.
             render: "fluid.identity()",
 
             drawFrame: {
@@ -185,7 +55,7 @@
                 type: "aconite.animationClock",
                 options: {
                     listeners: {
-                        onNextFrame: "{animator}.drawFrame"
+                        onTick: "{animator}.drawFrame"
                     }
                 }
             },
@@ -253,6 +123,9 @@
         aconite.makeSquareVertexBuffer(gl, vertexPosition);
     };
 
+    // This should be bound as a model listener for a component
+    // whose entire model consists of mappings to uniforms.
+    // perhaps a "shader program" component?
     aconite.animator.setFrameRateUniforms = function (model, glRenderer, uniformModelMap) {
         for (var name in uniformModelMap) {
             var modelPath = uniformModelMap[name],
@@ -274,7 +147,7 @@
 
 
     fluid.defaults("aconite.animator.playable", {
-        gradeNames: ["aconite.animator", "autoInit"],
+        gradeNames: "aconite.animator",
 
         components: {
             playButton: {
@@ -288,7 +161,7 @@
     });
 
     fluid.defaults("aconite.animator.debugging", {
-        gradeNames: ["aconite.animator", "autoInit"],
+        gradeNames: "aconite.animator",
 
         components: {
             frameCounter: {
@@ -300,7 +173,7 @@
 
     // TODO: Generalize this to an arbitrary number of layers.
     fluid.defaults("aconite.videoCompositor", {
-        gradeNames: ["aconite.animator", "autoInit"],
+        gradeNames: "aconite.animator",
 
         invokers: {
             render: "aconite.videoCompositor.refreshLayers({top}, {bottom})"
@@ -359,6 +232,7 @@
     });
 
     // TODO: Naming both for this functions and its callees.
+    // TODO: This should simply be an event.
     aconite.videoCompositor.refreshLayers = function (top, bottom) {
         top.refresh();
         bottom.refresh();
@@ -366,7 +240,7 @@
 
 
     fluid.defaults("aconite.videoCompositor.glRenderer", {
-        gradeNames: ["aconite.glComponent", "autoInit"],
+        gradeNames: "aconite.glComponent",
 
         // TODO: Factor these URLs that they can be
         // correctly relative to the user's project
@@ -393,23 +267,24 @@
             textureSize: {
                 type: "f",
                 value: [
-                    "{videoCompositor}.dom.stage.0.width", "{videoCompositor}.dom.stage.0.height"
+                    "{videoCompositor}.dom.stage.0.width",
+                    "{videoCompositor}.dom.stage.0.height"
                 ]
             }
         }
 
     });
     fluid.defaults("aconite.videoCompositor.topLayer", {
-        gradeNames: ["aconite.compositableVideo.layer", "autoInit"]
+        gradeNames: "aconite.compositableVideo.layer"
     });
 
     fluid.defaults("aconite.videoCompositor.bottomLayer", {
-        gradeNames: ["aconite.compositableVideo.layer", "autoInit"],
+        gradeNames: "aconite.compositableVideo.layer",
         bindToTextureUnit: "TEXTURE1"
     });
 
     fluid.defaults("aconite.videoSequenceCompositor", {
-        gradeNames: ["aconite.videoCompositor", "autoInit"],
+        gradeNames: "aconite.videoCompositor",
 
         components: {
             // User-specifiable.
@@ -440,8 +315,8 @@
         events: {
             onVideosReady: {
                 events: {
-                    topReady: "{top}.preRoller.events.onReady",
-                    bottomReady: "{bottom}.preRoller.events.onReady"
+                    topReady: "{top}.preroller.events.onReady",
+                    bottomReady: "{bottom}.preroller.events.onReady"
                 },
                 args: ["{arguments}.topReady.0", "{arguments}.bottomReady.0"]
             }

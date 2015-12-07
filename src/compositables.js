@@ -14,7 +14,7 @@
     fluid.registerNamespace("aconite");
 
     fluid.defaults("aconite.texture", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
+        gradeNames: "fluid.component",
 
         members: {
             gl: null
@@ -42,7 +42,6 @@
     });
 
     aconite.texture.create = function (that) {
-        // TODO: Figure out why this doesn't work as a member expander.
         var gl = that.gl,
             texture = gl.createTexture();
 
@@ -62,7 +61,7 @@
 
 
     fluid.defaults("aconite.compositable", {
-        gradeNames: ["aconite.texture", "autoInit"],
+        gradeNames: "aconite.texture",
 
         components: {
             source: {}
@@ -71,7 +70,12 @@
         invokers: {
             refresh: {
                 funcName: "aconite.compositable.refresh",
-                args: ["{that}.gl", "{that}.source", "{that}.texture", "{that}.options.bindToTextureUnit"]
+                args: [
+                    "{that}.gl",
+                    "{that}.source",
+                    "{that}.texture",
+                    "{that}.options.bindToTextureUnit"
+                ]
             }
         }
     });
@@ -88,22 +92,31 @@
     };
 
     fluid.defaults("aconite.compositableVideo", {
-        gradeNames: ["aconite.compositable", "autoInit"],
+        gradeNames: "aconite.compositable",
 
         invokers: {
-            play: "{that}.source.play()",
-            pause: "{that}.source.pause()"
+            play: "{that}.sourcePlayer.play()",
+            pause: "{that}.sourcePlayer.pause()"
         },
 
         components: {
             source: {
                 type: "aconite.video"
+            },
+
+            sourcePlayer: {
+                type: "aconite.videoPlayer.nativeElement",
+                options: {
+                    components: {
+                        video: "{compositableVideo}.source"
+                    }
+                }
             }
         }
     });
 
     fluid.defaults("aconite.compositableVideo.layer", {
-        gradeNames: ["aconite.compositableVideo"],
+        gradeNames: "aconite.compositableVideo",
         members: {
             gl: "{glRenderer}.gl"
         },
