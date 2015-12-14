@@ -71,8 +71,8 @@
 
         // TODO: This should be done by mutating the video component's model
         // not by direct property modifications.
-        var parsed = aconite.video.parseTimecode(inTime);
-        preRollEl.currentTime = parsed === undefined ? 0 : parsed;
+        var parsed = aconite.time.asNumber(inTime);
+        preRollEl.currentTime = isNaN(parsed) ? 0 : parsed;
 
         sourcePlayer.video.element = preRollEl;
         preroller.element = displayEl;
@@ -112,8 +112,8 @@
             return clip.duration;
         }
 
-        var inSecs = aconite.video.parseTimecode(clip.inTime),
-            outSecs = aconite.video.parseTimecode(clip.outTime);
+        var inSecs = aconite.time.parseTimecode(clip.inTime),
+            outSecs = aconite.time.parseTimecode(clip.outTime);
 
         if (inSecs === undefined) {
             inSecs = 0;

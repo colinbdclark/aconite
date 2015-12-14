@@ -38,6 +38,7 @@ module.exports = function(grunt) {
 
         aconite: [
             "src/core.js",
+            "src/timecode.js",
             "src/glComponent.js",
             "src/animation-clock.js",
             "src/animation.js",

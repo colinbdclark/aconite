@@ -16,6 +16,9 @@
     ],
     "readmeFilename": "README.md",
     "devDependencies": {
+        "jquery": "2.1.4",
+        "node-jqunit": "1.1.0",
+
         "grunt": "~0.4.2",
         "grunt-contrib-clean": "~0.4.1",
         "grunt-contrib-concat": "~0.3.0",

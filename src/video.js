@@ -60,20 +60,8 @@
         }
     });
 
-    // TODO: Harmonize this with other time fragment code elsewhere.
     aconite.video.composeURL = function (model) {
-        var timeFrag = "";
-
-        if (aconite.video.isTimeUnit(model.inTime)) {
-            timeFrag += "#t=" + model.inTime;
-            if (aconite.video.isTimeUnit(model.outTime)) {
-                timeFrag += "," + model.outTime;
-            } else if (typeof model.duration === "number") {
-                timeFrag += "," + aconite.video.parseTimecode(model.inTime) + model.duration;
-            }
-        }
-
-        return model.url + timeFrag;
+        return model.url + aconite.time.timeFragment(model);
     };
 
     aconite.video.renderVideoElement = function (that, model) {
@@ -107,61 +95,7 @@
         return videoEl && videoEl.readyState === 4;
     };
 
-    // TODO: Expand this to match the constraints of the specification more closely.
-    // http://www.w3.org/TR/media-frags/#naming-time
-    aconite.video.isTimeUnit = function (time) {
-        var timeType = typeof time;
-        return (timeType === "string" || timeType === "number");
-    };
-
-    aconite.video.isValidTimeSegment = function (seg) {
-        return (!isNaN(seg) && seg < Infinity && seg >= 0);
-    };
-
-    aconite.video.parseTimecode = function (time) {
-        if (typeof time !== "string") {
-            return time;
-        }
-
-        var segs = time.split(":");
-        if (segs.length === 4) {
-            fluid.log(fluid.logLevel.WARN, "Aconite doesn't yet support frame-specific SMPTE time codes. " +
-                "The frame position will be ignored. Timecode was: " + time);
-        } else if (segs.length < 3) {
-            throw new Error("Invalid timecode: " + time);
-        }
-
-        var seconds = Number(segs[2]),
-            minutes = Number(segs[1]),
-            hours = Number(segs[0]);
-
-        if (!aconite.video.isValidTimeSegment(seconds) ||
-            !aconite.video.isValidTimeSegment(minutes) ||
-            !aconite.video.isValidTimeSegment(hours)) {
-            throw new Error("Invalid timecode: " + time);
-        }
-
-        return seconds + (minutes * 60) + (hours * 3600);
-    };
-
-    aconite.video.createTimeFragment = function (clip) {
-        var frag = "#t=",
-            inTime,
-            outTime;
-
-        if (aconite.video.isTimeUnit(clip.inTime) && aconite.video.isTimeUnit(clip.outTime)) {
-            inTime = clip.inTime;
-            outTime = clip.outTime;
-        } else if (typeof clip.inTime === "number" && typeof clip.duration === "number") {
-            inTime = clip.inTime;
-            outTime = inTime + clip.duration;
-        }
-
-        return inTime !== undefined ? frag + inTime + "," + outTime : "";
-    };
-
     aconite.video.assignClip = function (vid, clip) {
-        var url = clip.url + aconite.video.createTimeFragment(clip);
-        vid.setURL(url);
+        vid.applier.change("", clip);
     };
 }());
