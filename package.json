@@ -30,7 +30,7 @@
     "dependencies": {
         "infusion": "2.0.0-dev.20151130T180545Z.18ee3f8",
         "bergson": "0.11.1",
-        "flocking": "colinbdclark/flocking#113fbef9fba902ca838ef737f0bfaba1420570f5"
+        "flocking": "colinbdclark/flocking#979c8bec0df8f11def9931772e54e12a0319d691"
     },
     "scripts": {
         "prepublish": "grunt"
