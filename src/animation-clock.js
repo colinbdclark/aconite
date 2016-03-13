@@ -6,7 +6,7 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, DSP*/
+/*global fluid, aconite, ArrayMath*/
 
 (function () {
     "use strict";
@@ -33,7 +33,7 @@
     });
 
     aconite.animationClock.frameCounter.maxDuration = function (intervalLog) {
-        return DSP.max(intervalLog);
+        return ArrayMath.max(intervalLog);
     };
 
     aconite.animationClock.frameCounter.avgDuration = function (frameCount, intervalLog) {
@@ -44,4 +44,5 @@
 
         return sum / frameCount;
     };
+
 }());
