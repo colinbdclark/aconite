@@ -27,7 +27,7 @@
 
             avgDuration: {
                 funcName: "aconite.animationClock.frameCounter.avgDuration",
-                args: ["{that}.model.frameCount", "{that}.intervalLog"]
+                args: ["{that}.tickCounter", "{that}.intervalLog"]
             }
         }
     });
@@ -36,13 +36,13 @@
         return ArrayMath.max(intervalLog);
     };
 
-    aconite.animationClock.frameCounter.avgDuration = function (frameCount, intervalLog) {
+    aconite.animationClock.frameCounter.avgDuration = function (tickCounter, intervalLog) {
         var sum = 0;
-        for (var i = 0; i < frameCount; i++) {
+        for (var i = 0; i < tickCounter; i++) {
             sum += intervalLog[i];
         }
 
-        return sum / frameCount;
+        return sum / tickCounter;
     };
 
 }());
