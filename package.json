@@ -28,9 +28,9 @@
         "grunt-contrib-watch": "^0.6.1"
     },
     "dependencies": {
-        "infusion": "2.0.0-dev.20151130T180545Z.18ee3f8",
-        "bergson": "0.11.1",
-        "flocking": "colinbdclark/flocking#979c8bec0df8f11def9931772e54e12a0319d691"
+        "infusion": "2.0.0-dev.20160309T145652Z.9f515ec",
+        "bergson": "colinbdclark/bergson#gh-3-4",
+        "flocking": "colinbdclark/flocking#gh-160"
     },
     "scripts": {
         "prepublish": "grunt"
