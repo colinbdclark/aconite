@@ -42,7 +42,7 @@
             sum += intervalLog[i];
         }
 
-        return sum / tickCounter;
+        return sum / tickCounter + 1;
     };
 
 }());
