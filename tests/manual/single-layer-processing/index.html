@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Single Layer Processing Test</title>
+
+        <link rel="stylesheet" href="../../../src/ui/css/stage.css" type="text/css" />
+        <style>
+            video: {
+                display: none;
+            }
+        </style>
+
+        <script src="../../../dist/aconite-all.js"></script>
+
+        <script src="../video-players/shared/js/video-player-test.js"></script>
+        <script src="js/single-layer-processing.js"></script>
+
+    </head>
+    <body>
+        <div class="aconite-video-container">
+            <canvas class="aconite-animator-canvas" width="680" height="480">
+                <video src="../../videos/all.m4v" />
+            </canvas>
+        </div>
+
+        <script>
+            window.singleLayerTest = aconite.test.singleLayerProcessor(".aconite-video-container");
+        </script>
+    </body>
+</html>

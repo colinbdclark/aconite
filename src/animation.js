@@ -170,6 +170,44 @@
         }
     });
 
+    // TODO: This is a distinctly bad name for this component!
+    fluid.defaults("aconite.glRenderer", {
+        gradeNames: "aconite.glComponent",
+
+        // TODO: Factor these URLs that they can be
+        // correctly relative to the user's project
+        shaders: {
+            fragment: "shaders/fragmentShader.frag",
+            vertex: "shaders/stageVertexShader.vert"
+        },
+
+        attributes: {
+            aVertexPosition: {
+                type: "vertexAttribArray"
+            }
+        },
+
+        uniforms: {
+            textureSize: {
+                type: "f",
+                value: [
+                    "{animator}.dom.stage.0.width",
+                    "{animator}.dom.stage.0.height"
+                ]
+            }
+        }
+    });
+
+    fluid.defaults("aconite.glRenderer.singleLayer", {
+        gradeNames: "aconite.glRenderer",
+
+        uniforms: {
+            layerSampler: {
+                type: "i",
+                value: 0
+            }
+        }
+    });
 
     // TODO: Generalize this to an arbitrary number of layers.
     fluid.defaults("aconite.videoCompositor", {
@@ -240,20 +278,7 @@
 
 
     fluid.defaults("aconite.videoCompositor.glRenderer", {
-        gradeNames: "aconite.glComponent",
-
-        // TODO: Factor these URLs that they can be
-        // correctly relative to the user's project
-        shaders: {
-            fragment: "shaders/fragmentShader.frag",
-            vertex: "shaders/stageVertexShader.vert"
-        },
-
-        attributes: {
-            aVertexPosition: {
-                type: "vertexAttribArray"
-            }
-        },
+        gradeNames: "aconite.glRenderer",
 
         uniforms: {
             topSampler: {
@@ -263,17 +288,10 @@
             bottomSampler: {
                 type: "i",
                 value: 1
-            },
-            textureSize: {
-                type: "f",
-                value: [
-                    "{videoCompositor}.dom.stage.0.width",
-                    "{videoCompositor}.dom.stage.0.height"
-                ]
             }
         }
-
     });
+
     fluid.defaults("aconite.videoCompositor.topLayer", {
         gradeNames: "aconite.compositableVideo.layer"
     });

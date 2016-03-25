@@ -53,6 +53,12 @@
             onVideoEnded: null
         },
 
+        listeners: {
+            onCreate: [
+                "aconite.video.bindVideoListeners({that}, {that}.element)"
+            ]
+        },
+
         url: "",
 
         templates: {
@@ -64,6 +70,22 @@
         return model.url + aconite.time.timeFragment(model);
     };
 
+    aconite.video.bindVideoListeners = function (that, video) {
+        var jVideo = jQuery(video);
+
+        jVideo.one("canplay", function () {
+            that.events.onReady.fire(that);
+        });
+
+        jVideo.bind("canplay", function () {
+            that.events.onVideoLoaded.fire(video);
+        });
+
+        jVideo.bind("ended", function () {
+            that.events.onVideoEnded.fire(video);
+        });
+    };
+
     aconite.video.renderVideoElement = function (that, model) {
         var url = aconite.video.composeURL(model),
             videoHTML = fluid.stringTemplate(that.options.templates.video, {
@@ -71,18 +93,6 @@
         });
 
         var video = jQuery(videoHTML);
-
-        video.one("canplay", function () {
-            that.events.onReady.fire(that);
-        });
-
-        video.bind("canplay", function () {
-            that.events.onVideoLoaded.fire(video);
-        });
-
-        video.bind("ended", function () {
-            that.events.onVideoEnded.fire(video);
-        });
 
         return video[0];
     };

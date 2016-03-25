@@ -3,7 +3,7 @@
 (function () {
     "use strict";
 
-    fluid.defaults("aconite.test.manualOnlineVideoPlayerTest", {
+    fluid.defaults("aconite.test.videoPlayerTest", {
         gradeNames: "fluid.viewComponent",
 
         components: {
@@ -11,13 +11,13 @@
                 type: "aconite.video",
                 options: {
                     members: {
-                        element: "{manualOnlineVideoPlayerTest}.dom.video.0"
+                        element: "{videoPlayerTest}.dom.video.0"
                     }
                 }
             },
 
             player: {
-                type: "aconite.videoPlayer.manualOnline",
+                type: "aconite.videoPlayer",
                 options: {
                     components: {
                         video: "{video}"
