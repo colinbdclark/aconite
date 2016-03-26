@@ -13,8 +13,8 @@
 
         components: {
             player: {
-                type: "aconite.videoPlayer.nativeElement",
-                container: "{singleLayerProcessor.dom.video}"
+                type: "aconite.test.singleLayerProcessor.videoPlayer",
+                container: "{singleLayerProcessor}.dom.video"
             },
 
             layer: {
@@ -34,6 +34,14 @@
 
         selectors: {
             video: "video"
+        }
+    });
+
+    fluid.defaults("aconite.test.singleLayerProcessor.videoPlayer", {
+        gradeNames: "aconite.videoPlayer.nativeElement",
+
+        model: {
+            loop: true
         }
     });
 
