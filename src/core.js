@@ -162,6 +162,8 @@
         gl[setter].apply(gl, args);
     };
 
+    // TODO: This API makes it very difficult to specify one dimensional vectors
+    // because it can't currently infer unidimensionality as it does for scalars types.
     aconite.setUniforms = function (gl, shaderProgram, uniforms) {
         fluid.each(uniforms, function (valueSpec, key) {
             aconite.setUniform(gl, shaderProgram, key, valueSpec.type, valueSpec.value);

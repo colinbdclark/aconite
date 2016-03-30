@@ -75,12 +75,26 @@
         gradeNames: "aconite.glRenderer.singleLayer",
 
         shaders: {
-            fragment: "shaders/greyscale.frag",
+            fragment: "shaders/colour-matrix.frag",
             vertex: "../../../src/shaders/stageVertexShader.vert"
         },
 
         uniforms: {
-            // Colour transform matrix goes here.
+            colourMatrix: {
+                type: "fv",
+                // TODO: Currently Aconite requires all array-typed uniforms
+                // (i.e. xfv uniforms) to explicitly declare their dimensions,
+                // hence the need to wrap the colour matrix in an container array.
+                value: [
+                    // Greyscale luma.
+                    [
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0, 0, 0, 1, 0
+                    ]
+                ]
+            }
         }
     });
 
