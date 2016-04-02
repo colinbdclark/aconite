@@ -151,12 +151,16 @@
     };
 
     // TODO: This function produces garbage each time it is called.
-    aconite.setUniform = function (gl, shaderProgram, name, type, values) {
+    aconite.setUniform = function (gl, shaderProgram, name, type, values, transpose) {
         values = fluid.makeArray(values);
 
-        var setter = "uniform" + values.length + type,
+        var setter = "uniform" + type,
             uniform = shaderProgram[name],
             args = fluid.copy(values);
+
+        if (transpose !== undefined) {
+            args.unshift(transpose);
+        }
 
         args.unshift(uniform);
         gl[setter].apply(gl, args);
@@ -166,7 +170,8 @@
     // because it can't currently infer unidimensionality as it does for scalars types.
     aconite.setUniforms = function (gl, shaderProgram, uniforms) {
         fluid.each(uniforms, function (valueSpec, key) {
-            aconite.setUniform(gl, shaderProgram, key, valueSpec.type, valueSpec.value);
+            aconite.setUniform(gl, shaderProgram, key, valueSpec.type, valueSpec.values,
+                valueSpec.transpose);
         });
     };
 

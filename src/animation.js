@@ -132,7 +132,7 @@
                 valueSpec = glRenderer.options.uniforms[name],
                 value = fluid.get(model, modelPath);
 
-            aconite.setUniform(glRenderer.gl, glRenderer.shaderProgram, name, valueSpec.type, value);
+            aconite.setUniform(glRenderer.gl, glRenderer.shaderProgram, name, valueSpec.type, value, valueSpec.transpose);
         }
     };
 
@@ -189,8 +189,8 @@
 
         uniforms: {
             textureSize: {
-                type: "f",
-                value: [
+                type: "2f",
+                values: [
                     "{animator}.dom.stage.0.width",
                     "{animator}.dom.stage.0.height"
                 ]
@@ -203,8 +203,8 @@
 
         uniforms: {
             layerSampler: {
-                type: "i",
-                value: 0
+                type: "1i",
+                values: 0
             }
         }
     });
@@ -282,12 +282,12 @@
 
         uniforms: {
             topSampler: {
-                type: "i",
-                value: 0
+                type: "1i",
+                values: 0
             },
             bottomSampler: {
-                type: "i",
-                value: 1
+                type: "1i",
+                values: 1
             }
         }
     });

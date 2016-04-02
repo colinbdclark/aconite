@@ -99,11 +99,11 @@
 
         uniforms: {
             colourMatrix: {
-                type: "fv",
+                type: "1fv",
                 // TODO: Currently Aconite requires all array-typed uniforms
                 // (i.e. xfv uniforms) to explicitly declare their dimensions,
                 // hence the need to wrap the colour matrix in an container array.
-                value: [
+                values: [
                     // Identity.
                     [
                         1, 0, 0, 0, 0,
