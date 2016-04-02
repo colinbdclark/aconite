@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Native Online Video Player Test</title>
+
+        <link rel="stylesheet" href="../../../../src/ui/css/stage.css" type="text/css" />
+
+        <script src="../../../../dist/aconite-all.js"></script>
+
+        <script src="../shared/js/base-video-player-test.js"></script>
+        <script src="js/online-native-video-player-test.js"></script>
+
+    </head>
+    <body>
+        <div class="aconite-video-container">
+            <video src="../../../videos/all.m4v" />
+        </div>
+
+        <script>
+            window.videoPlayerTest = aconite.test.nativeOnlineVideoPlayerTest(".aconite-video-container");
+        </script>
+    </body>
+</html>

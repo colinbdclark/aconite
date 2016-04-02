@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Single Layer Processing Test</title>
+
+        <link rel="stylesheet" href="../../../src/ui/css/stage.css" type="text/css" />
+
+        <script src="../../../dist/aconite-all.js"></script>
+        <script src="js/single-layer-processing.js"></script>
+    </head>
+    <body>
+        <div class="aconite-video-container">
+            <canvas class="aconite-animator-canvas" width="853" height="480">
+                <video src="../../videos/big-buck-bunny-trailer-480p.mp4" />
+            </canvas>
+        </div>
+
+        <script>
+            window.singleLayerTest = aconite.test.singleLayerProcessor(".aconite-video-container");
+        </script>
+    </body>
+</html>
