@@ -32,7 +32,12 @@
 
         components: {
             scheduler: {
-                type: "flock.scheduler.async"
+                type: "berg.scheduler",
+                options: {
+                    components: {
+                        clock: "{animator}.clock"
+                    }
+                }
             },
 
             layer: {},
@@ -100,10 +105,14 @@
     };
 
     aconite.clipSequencer.scheduleClipDisplay = function (atTime, nextClip, that) {
-        that.scheduler.once(atTime, function () {
-            that.model.clipIdx++;
-            aconite.clipSequencer.displayClip(that.layer, nextClip, that.model.clipIdx, that.preroller, that.events.onNextClip);
-            aconite.clipSequencer.scheduleNextClip(that);
+        that.scheduler.schedule({
+            type: "once",
+            time: atTime,
+            callback: function () {
+                that.model.clipIdx++;
+                aconite.clipSequencer.displayClip(that.layer, nextClip, that.model.clipIdx, that.preroller, that.events.onNextClip);
+                aconite.clipSequencer.scheduleNextClip(that);
+            }
         });
     };
 

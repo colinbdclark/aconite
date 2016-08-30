@@ -1,7 +1,8 @@
-/*global module*/
+/* eslint-env node */
 
-module.exports = function(grunt) {
-    "use strict";
+"use strict";
+
+module.exports = function (grunt) {
 
     var files = {
         jQuery: [

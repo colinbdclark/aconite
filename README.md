@@ -17,7 +17,7 @@ You'll need Grunt installed globally if you don't already have it. Here's how:
 
     npm install -g grunt-cli
 
-To download all of Aconite's dependencies and built it, run the following commands:
+To download all of Aconite's dependencies and build it, run the following commands:
 
     npm install
     grunt

@@ -88,12 +88,12 @@
             return;
         }
 
-        if (!flock.enviro.shared) {
+        if (!flock.environment) {
             flock.init();
         }
 
-        if (!flock.enviro.shared.model.isPlaying) {
-            flock.enviro.shared.play();
+        if (!flock.environment.model.isPlaying) {
+            flock.environment.play();
         }
     };
 
