@@ -71,7 +71,7 @@
 
         // TODO: This should be done by mutating the video component's model
         // not by direct property modifications.
-        var parsed = aconite.time.asNumber(inTime);
+        var parsed = aconite.time.parseTimecode(inTime);
         preRollEl.currentTime = isNaN(parsed) ? 0 : parsed;
 
         sourcePlayer.video.element = preRollEl;
