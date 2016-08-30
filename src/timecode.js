@@ -119,4 +119,4 @@
 
         return isNaN(outTime) ? frag : frag + "," + outTime;
     };
-}());
+})();

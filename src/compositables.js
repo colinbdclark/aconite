@@ -124,4 +124,4 @@
         bindToTextureUnit: "TEXTURE0"
     });
 
-}());
+})();

@@ -465,4 +465,4 @@ var fluid = fluid || require("infusion"),
     ];
 
     aconite.tests.time.runTestSuite(aconite.tests.time.testSuite);
-}());
+})();

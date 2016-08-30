@@ -114,4 +114,4 @@
         el.toggleClass(styles.fullScreen);
     };
 
-}());
+})();

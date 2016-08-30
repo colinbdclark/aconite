@@ -233,4 +233,4 @@
         that.video.element.currentTime += tickDuration;
         aconite.videoPlayer.checkEndTime(time, that);
     };
-}());
+})();

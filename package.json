@@ -19,20 +19,21 @@
         "jquery": "2.1.4",
         "node-jqunit": "1.1.0",
 
-        "grunt": "~0.4.2",
-        "grunt-contrib-clean": "~0.4.1",
-        "grunt-contrib-concat": "~0.3.0",
-        "grunt-contrib-copy": "~0.4.1",
-        "grunt-contrib-jshint": "~0.8.0",
-        "grunt-contrib-uglify": "~0.3.2",
-        "grunt-contrib-watch": "^0.6.1"
+        "grunt": "1.0.1",
+        "grunt-contrib-uglify": "1.0.1",
+        "grunt-contrib-clean": "1.0.0",
+        "grunt-contrib-copy": "1.0.0",
+        "grunt-contrib-concat": "1.0.1",
+        "fluid-grunt-eslint": "18.1.1",
+        "grunt-contrib-watch": "1.0.0"
     },
     "dependencies": {
-        "infusion": "2.0.0-dev.20160309T145652Z.9f515ec",
+        "infusion": "2.0.0-dev.20160519T222603Z.754d2c6",
         "bergson": "0.12.1",
-        "flocking": "colinbdclark/flocking#b3e07384cc2561ba9d57bf7ff299b2242aec3d74"
+        "flocking": "colinbdclark/flocking#6749bee2b7041b76f494bd188b755d568332eda0"
     },
     "scripts": {
-        "prepublish": "grunt"
+        "prepublish": "grunt",
+        "test": "testem ci --file tests/unit/testem.json"
     }
 }
