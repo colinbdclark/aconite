@@ -29,7 +29,7 @@
     },
     "dependencies": {
         "infusion": "2.0.0-dev.20160519T222603Z.754d2c6",
-        "bergson": "colinbdclark/bergson#549d53882c4aecc6e7564cbd4b50b7b1b5e3bef5",
+        "bergson": "0.12.3",
         "flocking": "colinbdclark/flocking#6749bee2b7041b76f494bd188b755d568332eda0"
     },
     "scripts": {
