@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Multilayer Compositing Manual Test</title>
+
+        <link rel="stylesheet" href="../../../src/ui/css/stage.css" type="text/css" />
+        <link rel="stylesheet" href="../../../src/ui/css/playButton.css" type="text/css" />
+
+        <script src="../../../dist/aconite-all.js"></script>
+        <script src="../../../src/ui/js/playButton.js"></script>
+
+        <script src="js/multi-layer-compositing-manual-test.js"></script>
+
+    </head>
+    <body>
+        <div class="aconite-video-container">
+            <img class="aconite-animator-play" src="../../../src/ui/images/play_overlay.png"></img>
+            <canvas class="aconite-animator-canvas" width="1280" height="720" />
+        </div>
+
+        <script>
+            window.multilayerTest = aconite.test.multilayerTest(".aconite-video-container");
+        </script>
+    </body>
+</html>

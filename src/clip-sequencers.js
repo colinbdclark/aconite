@@ -19,6 +19,16 @@
     fluid.defaults("aconite.clipSequencer", {
         gradeNames: "fluid.modelComponent",
 
+        // TODO: This doesn't quite work as expected;
+        // currently, it will enable looping through the
+        // sequence itself, but does not cause the underlying
+        // video clips to loop. So when cycling back to the beginning
+        // of a sequence, the original clip may well have
+        // reached its end and will not be playing.
+        //
+        // Should we support a second option, "clip loop"?
+        loop: false,
+
         model: {
             clipIdx: 0,
             clipSequence: []
@@ -65,9 +75,7 @@
                 "{that}.layer.play()",
                 "{that}.scheduleNextClip()"
             ]
-        },
-
-        loop: false
+        }
     });
 
     aconite.clipSequencer.swapClips = function (sourcePlayer, preroller, inTime) {

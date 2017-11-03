@@ -17,7 +17,8 @@
         gradeNames: "fluid.component",
 
         members: {
-            gl: null
+            gl: null,
+            texture: null
         },
 
         events: {
