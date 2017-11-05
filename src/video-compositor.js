@@ -12,29 +12,6 @@
     fluid.defaults("aconite.videoCompositor", {
         gradeNames: "aconite.animator",
 
-        distributeOptions: [
-            {
-                source: "{that}.options.drawableListeners",
-                target: "{that > aconite.drawable}.options"
-            },
-            {
-                source: "{that}.options.playableListeners",
-                target: "{that > aconite.playable}.options"
-            }
-        ],
-
-        drawableListeners: {
-            listeners: {
-                "{videoCompositor}.events.onDrawFrame": "{that}.draw()"
-            }
-        },
-
-        playableListeners: {
-            listeners: {
-                "{videoCompositor}.events.onPlay": "{that}.play()"
-            }
-        },
-
         components: {
             glRenderer: {
                 type: "fluid.mustBeOverridden"
@@ -43,6 +20,10 @@
 
         events: {
             onStart: null,
+
+            // TODO: We want to be able to boil this from an
+            // arbitrary number of playable children's
+            // onReady events.
             onVideosReady: null
         }
     });

@@ -22,6 +22,29 @@
             a: 1.0
         },
 
+        drawableListeners: {
+            listeners: {
+                "{videoCompositor}.events.onDrawFrame": "{that}.draw()"
+            }
+        },
+
+        playableListeners: {
+            listeners: {
+                "{videoCompositor}.events.onPlay": "{that}.play()"
+            }
+        },
+
+        distributeOptions: [
+            {
+                source: "{that}.options.drawableListeners",
+                target: "{that > aconite.drawable}.options"
+            },
+            {
+                source: "{that}.options.playableListeners",
+                target: "{that > aconite.playable}.options"
+            }
+        ],
+
         invokers: {
             drawFrame: {
                 funcName: "aconite.animator.drawFrame",
