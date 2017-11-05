@@ -6,13 +6,13 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, jQuery*/
-
 (function () {
     "use strict";
 
     fluid.defaults("aconite.video", {
         gradeNames: "fluid.modelComponent",
+
+        url: "",
 
         model: {
             inTime: null,
@@ -58,8 +58,6 @@
                 "aconite.video.bindVideoListeners({that}, {that}.element)"
             ]
         },
-
-        url: "",
 
         templates: {
             video: "<video src='%url' muted='true'/>"

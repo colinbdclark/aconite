@@ -1,10 +1,8 @@
-/*global fluid*/
-
 (function () {
     "use strict";
 
     fluid.defaults("aconite.test.singleLayerProcessor", {
-        gradeNames: ["aconite.animator"],
+        gradeNames: ["aconite.videoCompositor.autoPlay"],
 
         model: {
             colourMatrix:  [
@@ -24,13 +22,6 @@
             colourMatrix: "colourMatrix"
         },
 
-        invokers: {
-            // TODO:
-            // - harmonize naming
-            // - refactor render as an event.
-            render: "{layer}.refresh()"
-        },
-
         components: {
             layer: {
                 type: "aconite.test.singleLayerProcessor.videoLayer",
@@ -43,19 +34,14 @@
         },
 
         events: {
-            onAllReady: {
-                events: {
-                    onVideoReady: "{that}.layer.source.events.onReady",
-                    onAnimatorReady: "{that}.events.onReady"
-                }
-            }
+            onVideosReady: "{that}.layer.source.events.onReady"
         },
 
         listeners: {
-            onAllReady: [
-                "{that}.play()",
-                "{layer}.play()"
-            ]
+            "onPlay.playLayer": {
+                after: "startClock",
+                func: "{layer}.play"
+            }
         }
     });
 
@@ -68,7 +54,9 @@
     });
 
     fluid.defaults("aconite.test.singleLayerProcessor.videoLayer", {
-        gradeNames: ["aconite.compositableVideo.layer", "fluid.viewComponent"],
+        gradeNames: [
+            "aconite.compositableVideo.layer", "fluid.viewComponent"
+        ],
 
         components: {
             source: {

@@ -46,6 +46,7 @@ module.exports = function (grunt) {
             "src/video.js",
             "src/video-player.js",
             "src/compositables.js",
+            "src/video-compositor.js",
             "src/clip-sequencers.js",
             "src/fcpxml-parser.js",
             "src/pip.js",

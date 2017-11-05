@@ -1,5 +1,3 @@
-/*global fluid*/
-
 (function () {
     "use strict";
 

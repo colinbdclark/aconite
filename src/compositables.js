@@ -6,8 +6,6 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite*/
-
 (function () {
     "use strict";
 
@@ -62,15 +60,18 @@
 
 
     fluid.defaults("aconite.compositable", {
-        gradeNames: "aconite.texture",
+        gradeNames: [
+            "aconite.drawable",
+            "aconite.texture"
+        ],
 
         components: {
             source: {}
         },
 
         invokers: {
-            refresh: {
-                funcName: "aconite.compositable.refresh",
+            draw: {
+                funcName: "aconite.compositable.draw",
                 args: [
                     "{that}.gl",
                     "{that}.source",
@@ -81,7 +82,7 @@
         }
     });
 
-    aconite.compositable.refresh = function (gl, source, texture, textureUnit) {
+    aconite.compositable.draw = function (gl, source, texture, textureUnit) {
         if (!source.isReady()) {
             return;
         }
@@ -93,7 +94,10 @@
     };
 
     fluid.defaults("aconite.compositableVideo", {
-        gradeNames: "aconite.compositable",
+        gradeNames: [
+            "aconite.playable",
+            "aconite.compositable"
+        ],
 
         invokers: {
             play: "{that}.sourcePlayer.play()",
@@ -113,6 +117,10 @@
                     }
                 }
             }
+        },
+
+        events: {
+            onReady: "{source}.events.onReady"
         }
     });
 

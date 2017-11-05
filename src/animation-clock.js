@@ -6,7 +6,7 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, ArrayMath*/
+/*global ArrayMath*/
 
 (function () {
     "use strict";

@@ -1,13 +1,11 @@
-/*global fluid*/
-
 (function () {
     "use strict";
 
     fluid.defaults("aconite.test.clipSequencingTest", {
         gradeNames: [
-            "aconite.animator.playable",
             "aconite.animator.debugging",
-            "aconite.videoSequenceCompositor"
+            "aconite.videoCompositor.withPlayButton",
+            "aconite.dualVideoSequenceCompositor"
         ],
 
         uniformModelMap: {},
@@ -36,6 +34,19 @@
             fpsCounter: ".aconite-fps-display"
         }
     });
+
+
+    fluid.defaults("aconite.test.clipSequencingTest.glRenderer", {
+        gradeNames: "aconite.dualLayerVideoCompositor.glRenderer",
+
+        shaders: {
+            fragment: "shaders/offset-layer.frag",
+            vertex: "../../../src/shaders/stageVertexShader.vert"
+        },
+
+        uniforms: {}
+    });
+
 
     fluid.defaults("aconite.test.clipSequencingTest.topSequencer", {
         gradeNames: "aconite.clipSequencer.static",
@@ -67,10 +78,11 @@
 
         components: {
             layer: {
-                type: "aconite.videoCompositor.topLayer"
+                type: "aconite.dualLayerVideoCompositor.topLayer"
             }
         }
     });
+
 
     fluid.defaults("aconite.test.clipSequencingTest.bottomSequencer", {
         gradeNames: "aconite.clipSequencer.static",
@@ -86,20 +98,8 @@
 
         components: {
             layer: {
-                type: "aconite.videoCompositor.bottomLayer"
+                type: "aconite.dualLayerVideoCompositor.bottomLayer"
             }
         }
     });
-
-    fluid.defaults("aconite.test.clipSequencingTest.glRenderer", {
-        gradeNames: "aconite.videoCompositor.glRenderer",
-
-        shaders: {
-            fragment: "../../../src/shaders/readTopLayerFragmentShader.frag",
-            vertex: "../../../src/shaders/stageVertexShader.vert"
-        },
-
-        uniforms: {}
-    });
-
 })();

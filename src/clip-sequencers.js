@@ -6,8 +6,6 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, jQuery*/
-
 (function () {
     "use strict";
 
@@ -17,7 +15,11 @@
      * Sequences the playback of a colection of clips described by the "clipSequence" option
      */
     fluid.defaults("aconite.clipSequencer", {
-        gradeNames: "fluid.modelComponent",
+        gradeNames: [
+            "fluid.modelComponent",
+            "aconite.playable",
+            "aconite.drawable"
+        ],
 
         // TODO: This doesn't quite work as expected;
         // currently, it will enable looping through the
@@ -36,8 +38,9 @@
 
         invokers: {
             play: "{that}.events.onPlay.fire()",
+            pause: "{that}.events.onPause.fire()",
             scheduleNextClip: "aconite.clipSequencer.scheduleNextClip({that})",
-            refresh: "{that}.layer.refresh()"
+            draw: "{that}.layer.draw()"
         },
 
         components: {
@@ -50,7 +53,9 @@
                 }
             },
 
-            layer: {},
+            layer: {
+                type: "fluid.mustBeOverridden"
+            },
 
             preroller: {
                 type: "aconite.video"
@@ -59,22 +64,39 @@
 
         events: {
             onSequenceReady: null,
-            onReady: null,
+            // TODO: Do we also need to wait for the layer
+            // to be ready?
+            onReady: "{preroller}.events.onReady",
             onNextClip: null,
-            onPlay: null
+            onPlay: null,
+            onPause: null
         },
 
         listeners: {
-            onSequenceReady: [
-                "aconite.clipSequencer.expandClips({that})",
-                "aconite.clipSequencer.prepareForPlay({that})",
-                "{that}.events.onReady.fire()"
-            ],
+            "onSequenceReady.expandClips": {
+                funcName: "aconite.clipSequencer.expandClips",
+                args: ["{that}"]
+            },
 
-            onPlay: [
-                "{that}.layer.play()",
-                "{that}.scheduleNextClip()"
-            ]
+            "onSequenceReady.prepareForPlay": {
+                priority: "after:expandClips",
+                funcName: "aconite.clipSequencer.prepareForPlay",
+                args: ["{that}"]
+            },
+
+            "onSequenceReady.fireReady": {
+                priority: "after:prepareForPlay",
+                func: "{that}.events.onReady.fire"
+            },
+
+            "onPlay.playLayer": "{that}.layer.play()",
+
+            "onPlay.scheduleNextClip": {
+                priority: "after:playLayer",
+                func: "{that}.scheduleNextClip"
+            },
+
+            "onPause.pauseLayer": "{that}.layer.pause()"
         }
     });
 

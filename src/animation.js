@@ -6,8 +6,6 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite*/
-
 (function () {
     "use strict";
 
@@ -17,7 +15,6 @@
         // TODO: Replace this with model relay.
         uniformModelMap: {},  // Uniform name : model path
 
-        // TODO: Factor stage-related behaviour into a separate component.
         stageBackgroundColor: {
             r: 0.0,
             g: 0.0,
@@ -26,22 +23,13 @@
         },
 
         invokers: {
-            // TODO: Determine whether this invoker is
-            // actually used by any clients. If not, remove it.
-            updateModel: "fluid.identity()",
-
-            // TODO: Determine whether this invoker is
-            // actually used by any clients. If not, remove it.
-            render: "fluid.identity()",
-
             drawFrame: {
                 funcName: "aconite.animator.drawFrame",
                 args: [
                     "{that}",
                     "{glRenderer}",
                     "{that}.options.uniformModelMap",
-                    "{that}.updateModel",
-                    "{that}.render"
+                    "{that}.events.onDrawFrame.fire"
                 ]
             },
 
@@ -75,31 +63,31 @@
         events: {
             onReady: null,
             onPlay: null,
+            onDrawFrame: null,
             onPause: null
         },
 
         listeners: {
-            onReady: [
-                {
-                    funcName: "aconite.animator.setStageColor",
-                    args: ["{glRenderer}.gl", "{that}.options.stageBackgroundColor"]
-                },
+            "onReady.setStageColor": {
+                funcName: "aconite.animator.setStageColor",
+                args: ["{glRenderer}.gl", "{that}.options.stageBackgroundColor"]
+            },
 
-                {
-                    funcName: "aconite.animator.makeStageVertex",
-                    args: [
-                        "{glRenderer}.gl",
-                        "{glRenderer}.shaderProgram.aVertexPosition"
-                    ]
-                }
-            ],
+            "onReady.makeStageVertex": {
+                after: "setStageColor",
+                funcName: "aconite.animator.makeStageVertex",
+                args: [
+                    "{glRenderer}.gl",
+                    "{glRenderer}.shaderProgram.aVertexPosition"
+                ]
+            },
 
-            onPlay: {
+            "onPlay.startClock": {
                 func: "{that}.clock.start",
                 priority: "last"
             },
 
-            onPause: {
+            "onPause.startClock": {
                 func: "{that}.clock.stop",
                 priority: "first"
             }
@@ -135,29 +123,14 @@
         }
     };
 
-    aconite.animator.drawFrame = function (that, glRenderer, uniformModelMap, onNextFrame, afterNextFrame) {
+    aconite.animator.drawFrame = function (that, glRenderer, uniformModelMap, onDrawFrame) {
         var gl = glRenderer.gl;
 
-        onNextFrame(that, glRenderer);
         aconite.animator.setFrameRateUniforms(that.model, glRenderer, uniformModelMap);
-        afterNextFrame(that, glRenderer);
+        onDrawFrame(that, glRenderer);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
     };
 
-
-    fluid.defaults("aconite.animator.playable", {
-        gradeNames: "aconite.animator",
-
-        components: {
-            playButton: {
-                options: {
-                    selectors: {
-                        fullScreen: "{playable}.options.selectors.stage"
-                    }
-                }
-            }
-        }
-    });
 
     fluid.defaults("aconite.animator.debugging", {
         gradeNames: "aconite.animator",
@@ -208,136 +181,34 @@
         }
     });
 
-    // TODO: Generalize this to an arbitrary number of layers.
-    fluid.defaults("aconite.videoCompositor", {
-        gradeNames: "aconite.animator",
+
+    fluid.defaults("aconite.drawable", {
+        gradeNames: "fluid.component",
 
         invokers: {
-            render: "aconite.videoCompositor.refreshLayers({top}, {bottom})"
-        },
+            draw: "fluid.mustBeOverridden"
+        }
+    });
 
-        components: {
-            glRenderer: {
-                type: "aconite.videoCompositor.glRenderer"
-            },
+    fluid.defaults("aconite.playable", {
+        gradeNames: "fluid.component",
 
-            // User-specifiable.
-            top: {
-                type: "aconite.videoCompositor.topLayer"
-            },
-
-            // User-specifiable.
-            bottom: {
-                type: "aconite.videoCompositor.bottomLayer"
-            },
-
-            playButton: {
-                createOnEvent: "onVideosReady",
-                type: "aconite.ui.playButtonOverlay",
-                container: "{videoCompositor}.dom.playButton",
-                options: {
-                    events: {
-                        onActivated: "{videoCompositor}.events.onStart",
-                        onPlay: "{videoCompositor}.events.onPlay"
-                    }
-                }
-            }
+        invokers: {
+            play: "fluid.mustBeOverridden",
+            pause: "fluid.mustBeOverridden"
         },
 
         events: {
-            onStart: null,
+            onReady: null
+        }
+    });
 
-            onVideosReady: {
-                events: {
-                    topReady: "{top}.source.events.onReady",
-                    bottomReady: "{bottom}.source.events.onReady"
-                },
-                args: ["{arguments}.topReady.0", "{arguments}.bottomReady.0"]
-            }
-        },
+
+    fluid.defaults("aconite.immediatelyPlayable", {
+        gradeNames: "aconite.playable",
 
         listeners: {
-            onPlay: [
-                "{top}.play()",
-                "{bottom}.play()"
-            ]
-        },
-
-        selectors: {
-            playButton: ".aconite-animator-play"
+            "onCreate.fireOnReady": "{that}.events.onReady.fire({that})"
         }
     });
-
-    // TODO: Naming both for this functions and its callees.
-    // TODO: This should simply be an event.
-    aconite.videoCompositor.refreshLayers = function (top, bottom) {
-        top.refresh();
-        bottom.refresh();
-    };
-
-
-    fluid.defaults("aconite.videoCompositor.glRenderer", {
-        gradeNames: "aconite.glRenderer",
-
-        uniforms: {
-            topSampler: {
-                type: "1i",
-                values: 0
-            },
-            bottomSampler: {
-                type: "1i",
-                values: 1
-            }
-        }
-    });
-
-    fluid.defaults("aconite.videoCompositor.topLayer", {
-        gradeNames: "aconite.compositableVideo.layer"
-    });
-
-    fluid.defaults("aconite.videoCompositor.bottomLayer", {
-        gradeNames: "aconite.compositableVideo.layer",
-        bindToTextureUnit: "TEXTURE1"
-    });
-
-    fluid.defaults("aconite.videoSequenceCompositor", {
-        gradeNames: "aconite.videoCompositor",
-
-        components: {
-            // User-specifiable.
-            top: {
-                type: "aconite.clipSequencer",
-                options: {
-                    components: {
-                        layer: {
-                            type: "aconite.videoCompositor.topLayer"
-                        }
-                    }
-                }
-            },
-
-            // User-specifiable.
-            bottom: {
-                type: "aconite.clipSequencer",
-                options: {
-                    components: {
-                        layer: {
-                            type: "aconite.videoCompositor.bottomLayer"
-                        }
-                    }
-                }
-            }
-        },
-
-        events: {
-            onVideosReady: {
-                events: {
-                    topReady: "{top}.preroller.events.onReady",
-                    bottomReady: "{bottom}.preroller.events.onReady"
-                },
-                args: ["{arguments}.topReady.0", "{arguments}.bottomReady.0"]
-            }
-        }
-    });
-
 })();

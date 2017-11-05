@@ -6,7 +6,7 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, berg*/
+/*global berg*/
 
 (function () {
     "use strict";
