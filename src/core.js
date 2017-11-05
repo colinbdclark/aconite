@@ -6,7 +6,7 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, jQuery*/
+/*global fluid, aconite, Float32Array*/
 
 (function () {
     "use strict";
@@ -196,4 +196,4 @@
         return info;
     };
 
-}());
+})();

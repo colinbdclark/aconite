@@ -83,7 +83,6 @@
                 {
                     funcName: "aconite.animator.setStageColor",
                     args: ["{glRenderer}.gl", "{that}.options.stageBackgroundColor"]
-
                 },
 
                 {
@@ -341,4 +340,4 @@
         }
     });
 
-}());
+})();

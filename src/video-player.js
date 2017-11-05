@@ -59,7 +59,7 @@
 
         modelListeners: {
             inTime: [
-                "aconite.videoPlayer.seekToInTime({change}.value, {that})"
+                "aconite.videoPlayer.seekToTime({change}.value, {that})"
             ],
 
             outTime: [
@@ -68,9 +68,9 @@
         }
     });
 
-    aconite.videoPlayer.seekToInTime = function (inTime, that) {
+    aconite.videoPlayer.seekToTime = function (time, that) {
         if (that.model.seekImmediately) {
-            that.video.element.currentTime = inTime;
+            that.video.element.currentTime = time;
         }
     };
 
@@ -233,4 +233,4 @@
         that.video.element.currentTime += tickDuration;
         aconite.videoPlayer.checkEndTime(time, that);
     };
-}());
+})();

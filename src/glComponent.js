@@ -87,4 +87,4 @@
         that.events.afterShaderProgramCompiled.fire(that.shaderProgram);
     };
 
-}());
+})();

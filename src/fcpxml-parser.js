@@ -112,4 +112,4 @@
         return operands.length > 1 ? operands[0] / operands[1] : operands[0];
     };
 
-}());
+})();

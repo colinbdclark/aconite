@@ -45,4 +45,4 @@
         return sum / (tickCounter + 1);
     };
 
-}());
+})();

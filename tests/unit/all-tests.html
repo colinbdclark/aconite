@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>All Aconite Tests</title>
+
+    <link rel="stylesheet" media="screen" href="../../node_modules/infusion/tests/lib/qunit/css/qunit.css" />
+    <link rel="stylesheet" href="../../node_modules/infusion/tests/lib/qunit/addons/composite/qunit-composite.css">
+    <script src="../../node_modules/infusion/tests/lib/qunit/js/qunit.js"></script>
+    <script src="/testem.js"></script>
+    <script src="../../node_modules/infusion/tests/lib/qunit/addons/composite/qunit-composite.js"></script>
+
+    <!--
+        command line search:
+        find . -name "*-test.html" | awk '{print "\""$1"\","}'
+    -->
+    <script>
+    QUnit.testSuites("All Aconite Tests", [
+        "./timecode-tests.html"
+    ]);
+    </script>
+</head>
+<body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture">
+</div>
+</body>
+</html>

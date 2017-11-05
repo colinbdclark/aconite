@@ -1,7 +1,8 @@
-/*global module*/
+/* eslint-env node */
 
-module.exports = function(grunt) {
-    "use strict";
+"use strict";
+
+module.exports = function (grunt) {
 
     var files = {
         jQuery: [
@@ -56,14 +57,8 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
 
-        jshint: {
-            all: [
-                "src/**/*.js",
-                "tests/**/*js"
-            ],
-            options: {
-                jshintrc: true
-            }
+        eslint: {
+            all: ["src/**/*.js", "tests/**/*.js"],
         },
 
         concat: {
@@ -136,8 +131,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-clean");
-    grunt.loadNpmTasks("grunt-contrib-jshint");
+    grunt.loadNpmTasks("fluid-grunt-eslint");
     grunt.loadNpmTasks("grunt-contrib-watch");
 
-    grunt.registerTask("default", ["clean", "jshint", "concat", "uglify"]);
+    grunt.registerTask("default", ["clean", "eslint", "concat", "uglify"]);
 };

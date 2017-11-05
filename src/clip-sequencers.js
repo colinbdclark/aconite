@@ -19,6 +19,16 @@
     fluid.defaults("aconite.clipSequencer", {
         gradeNames: "fluid.modelComponent",
 
+        // TODO: This doesn't quite work as expected;
+        // currently, it will enable looping through the
+        // sequence itself, but does not cause the underlying
+        // video clips to loop. So when cycling back to the beginning
+        // of a sequence, the original clip may well have
+        // reached its end and will not be playing.
+        //
+        // Should we support a second option, "clip loop"?
+        loop: false,
+
         model: {
             clipIdx: 0,
             clipSequence: []
@@ -32,7 +42,12 @@
 
         components: {
             scheduler: {
-                type: "flock.scheduler.async"
+                type: "berg.scheduler",
+                options: {
+                    components: {
+                        clock: "{animator}.clock"
+                    }
+                }
             },
 
             layer: {},
@@ -60,9 +75,7 @@
                 "{that}.layer.play()",
                 "{that}.scheduleNextClip()"
             ]
-        },
-
-        loop: false
+        }
     });
 
     aconite.clipSequencer.swapClips = function (sourcePlayer, preroller, inTime) {
@@ -71,7 +84,7 @@
 
         // TODO: This should be done by mutating the video component's model
         // not by direct property modifications.
-        var parsed = aconite.time.asNumber(inTime);
+        var parsed = aconite.time.parseTimecode(inTime);
         preRollEl.currentTime = isNaN(parsed) ? 0 : parsed;
 
         sourcePlayer.video.element = preRollEl;
@@ -100,10 +113,14 @@
     };
 
     aconite.clipSequencer.scheduleClipDisplay = function (atTime, nextClip, that) {
-        that.scheduler.once(atTime, function () {
-            that.model.clipIdx++;
-            aconite.clipSequencer.displayClip(that.layer, nextClip, that.model.clipIdx, that.preroller, that.events.onNextClip);
-            aconite.clipSequencer.scheduleNextClip(that);
+        that.scheduler.schedule({
+            type: "once",
+            time: atTime,
+            callback: function () {
+                that.model.clipIdx++;
+                aconite.clipSequencer.displayClip(that.layer, nextClip, that.model.clipIdx, that.preroller, that.events.onNextClip);
+                aconite.clipSequencer.scheduleNextClip(that);
+            }
         });
     };
 
@@ -216,5 +233,4 @@
             ]
         }
     });
-
-}());
+})();

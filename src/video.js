@@ -89,8 +89,8 @@
     aconite.video.renderVideoElement = function (that, model) {
         var url = aconite.video.composeURL(model),
             videoHTML = fluid.stringTemplate(that.options.templates.video, {
-            url: url
-        });
+                url: url
+            });
 
         var video = jQuery(videoHTML);
 
@@ -108,4 +108,4 @@
     aconite.video.assignClip = function (vid, clip) {
         vid.applier.change("", clip);
     };
-}());
+})();

@@ -25,7 +25,9 @@
         },
 
         invokers: {
-            // TODO: You see how crazy this is on so many levels, right?
+            // TODO:
+            // - harmonize naming
+            // - refactor render as an event.
             render: "{layer}.refresh()"
         },
 
@@ -116,4 +118,4 @@
         }
     });
 
-}());
+})();
