@@ -1,3 +1,5 @@
+/*global fluid, colin*/
+
 (function () {
     "use strict";
 
@@ -147,7 +149,7 @@
             id: "osc",
             ugen: "flock.ugen.triOsc",
             inputs: {
-                freq: 1/15,
+                freq: 1 / 15,
                 mul: 0.2,
                 add: 0.5,
                 phase: -1
@@ -160,4 +162,4 @@
             ]
         }
     });
-}());
+})();
