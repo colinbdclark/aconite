@@ -22,13 +22,13 @@
             a: 1.0
         },
 
-        drawableListeners: {
+        drawableChildOptions: {
             listeners: {
                 "{videoCompositor}.events.onDrawFrame": "{that}.draw()"
             }
         },
 
-        playableListeners: {
+        playableChildOptions: {
             listeners: {
                 "{videoCompositor}.events.onPlay": "{that}.play()"
             }
@@ -36,11 +36,11 @@
 
         distributeOptions: [
             {
-                source: "{that}.options.drawableListeners",
+                source: "{that}.options.drawableChildOptions",
                 target: "{that > aconite.drawable}.options"
             },
             {
-                source: "{that}.options.playableListeners",
+                source: "{that}.options.playableChildOptions",
                 target: "{that > aconite.playable}.options"
             }
         ],
