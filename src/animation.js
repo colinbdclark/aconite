@@ -51,13 +51,13 @@
 
         drawableChildOptions: {
             listeners: {
-                "{videoCompositor}.events.onDraw": "{that}.draw()"
+                "{animator}.events.onDraw": "{that}.draw()"
             }
         },
 
         playableChildOptions: {
             listeners: {
-                "{videoCompositor}.events.onPlay": "{that}.play()"
+                "{animator}.events.onPlay": "{that}.play()"
             }
         },
 
