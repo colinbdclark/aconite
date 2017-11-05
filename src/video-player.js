@@ -145,21 +145,16 @@
         },
 
         listeners: {
-            "onPlay.startClock": [
-                "{that}.clock.start()"
-            ],
+            "onPlay.startClock": "{that}.clock.start()",
 
-            "onPause.stopClock": [
-                "{that}.clock.stop()"
-            ],
+            "onPause.stopClock": "{that}.clock.stop()",
 
-            "onTick.advanceVideo": [
-                "aconite.videoPlayer.manual.advanceVideo({arguments}.0, {that})"
-            ],
+            "onTick.advanceVideo": {
+                funcName: "aconite.videoPlayer.manual.advanceVideo",
+                args: ["{arguments}.0", "{that}"]
+            },
 
-            onVideoEnded: [
-                "aconite.videoPlayer.manual.end({that})"
-            ]
+            "onVideoEnded.end": "aconite.videoPlayer.manual.end({that})"
         }
     });
 
@@ -198,13 +193,11 @@
         },
 
         listeners: {
-            onPlay: [
-                {
-                    priority: "before:startClock",
-                    funcName: "aconite.videoPlayer.manualOnline.resetPreviousTime",
-                    args: ["{that}"]
-                }
-            ]
+            "onPlay.resetPreviousTime": {
+                priority: "before:startClock",
+                funcName: "aconite.videoPlayer.manualOnline.resetPreviousTime",
+                args: ["{that}"]
+            }
         }
     });
 

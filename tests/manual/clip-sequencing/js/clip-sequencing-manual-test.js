@@ -17,6 +17,10 @@
 
             playButton: {
                 options: {
+                    // TODO: This play delay exposes a bug in the
+                    // overal synchronization of the system.
+                    // Note how the multi-clip sequencer seems to change
+                    // clips sooner than it should!
                     playDelay: 2
                 }
             },

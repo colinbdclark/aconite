@@ -38,10 +38,7 @@
         },
 
         listeners: {
-            "onPlay.playLayer": {
-                after: "startClock",
-                func: "{layer}.play"
-            }
+            "onPlay.playLayer": "{layer}.play()"
         }
     });
 

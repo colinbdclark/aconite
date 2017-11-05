@@ -74,7 +74,7 @@
             },
 
             "onReady.makeStageVertex": {
-                after: "setStageColor",
+                priority: "after:setStageColor",
                 funcName: "aconite.animator.makeStageVertex",
                 args: [
                     "{glRenderer}.gl",
