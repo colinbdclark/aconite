@@ -9,8 +9,35 @@
 (function () {
     "use strict";
 
+    fluid.defaults("aconite.playable", {
+        gradeNames: "fluid.component",
+
+        invokers: {
+            play: "fluid.mustBeOverridden",
+            pause: "fluid.mustBeOverridden"
+        },
+
+        events: {
+            onReady: null
+        }
+    });
+
+
+    fluid.defaults("aconite.immediatelyPlayable", {
+        gradeNames: "aconite.playable",
+
+        listeners: {
+            "onCreate.fireOnReady": "{that}.events.onReady.fire({that})"
+        }
+    });
+
+
     fluid.defaults("aconite.animator", {
-        gradeNames: "fluid.viewComponent",
+        gradeNames: [
+            "aconite.drawable",
+            "aconite.playable",
+            "fluid.viewComponent"
+        ],
 
         // TODO: Replace this with model relay.
         uniformModelMap: {},  // Uniform name : model path
@@ -24,7 +51,7 @@
 
         drawableChildOptions: {
             listeners: {
-                "{videoCompositor}.events.onDrawFrame": "{that}.draw()"
+                "{videoCompositor}.events.onDraw": "{that}.draw()"
             }
         },
 
@@ -46,13 +73,13 @@
         ],
 
         invokers: {
-            drawFrame: {
-                funcName: "aconite.animator.drawFrame",
+            draw: {
+                funcName: "aconite.animator.draw",
                 args: [
                     "{that}",
                     "{glRenderer}",
                     "{that}.options.uniformModelMap",
-                    "{that}.events.onDrawFrame.fire"
+                    "{that}.events.onDraw.fire"
                 ]
             },
 
@@ -66,7 +93,7 @@
                 type: "aconite.animationClock",
                 options: {
                     listeners: {
-                        onTick: "{animator}.drawFrame"
+                        onTick: "{animator}.draw"
                     }
                 }
             },
@@ -86,7 +113,7 @@
         events: {
             onReady: null,
             onPlay: null,
-            onDrawFrame: null,
+            onDraw: null,
             onPause: null
         },
 
@@ -146,11 +173,11 @@
         }
     };
 
-    aconite.animator.drawFrame = function (that, glRenderer, uniformModelMap, onDrawFrame) {
+    aconite.animator.draw = function (that, glRenderer, uniformModelMap, onDraw) {
         var gl = glRenderer.gl;
 
         aconite.animator.setFrameRateUniforms(that.model, glRenderer, uniformModelMap);
-        onDrawFrame(that, glRenderer);
+        onDraw(that, glRenderer);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
     };
 
@@ -210,28 +237,6 @@
 
         invokers: {
             draw: "fluid.mustBeOverridden"
-        }
-    });
-
-    fluid.defaults("aconite.playable", {
-        gradeNames: "fluid.component",
-
-        invokers: {
-            play: "fluid.mustBeOverridden",
-            pause: "fluid.mustBeOverridden"
-        },
-
-        events: {
-            onReady: null
-        }
-    });
-
-
-    fluid.defaults("aconite.immediatelyPlayable", {
-        gradeNames: "aconite.playable",
-
-        listeners: {
-            "onCreate.fireOnReady": "{that}.events.onReady.fire({that})"
         }
     });
 })();
