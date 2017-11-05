@@ -1,3 +1,5 @@
+/*global fluid, colin*/
+
 (function () {
     "use strict";
 
