@@ -64,9 +64,12 @@
 
         events: {
             onSequenceReady: null,
-            // TODO: Do we also need to wait for the layer
-            // to be ready?
-            onReady: "{preroller}.events.onReady",
+            onReady: {
+                events: {
+                    prerollerReady: "{preroller}.events.onReady",
+                    layerReady: "{layer}.events.onReady"
+                }
+            },
             onNextClip: null,
             onPlay: null,
             onPause: null

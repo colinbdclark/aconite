@@ -39,14 +39,16 @@ module.exports = function (grunt) {
 
         aconite: [
             "src/core.js",
+            "src/readiness-notification.js",
             "src/timecode.js",
             "src/glComponent.js",
             "src/animation-clock.js",
             "src/animation.js",
+            "src/compositor.js",
             "src/video.js",
             "src/video-player.js",
             "src/compositables.js",
-            "src/video-compositor.js",
+            "src/video-compositors.js",
             "src/clip-sequencers.js",
             "src/fcpxml-parser.js",
             "src/pip.js",

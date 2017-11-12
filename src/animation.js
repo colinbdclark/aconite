@@ -9,12 +9,11 @@
 (function () {
     "use strict";
 
-    fluid.defaults("aconite.playable", {
+    fluid.defaults("aconite.drawable", {
         gradeNames: "fluid.component",
 
         invokers: {
-            play: "fluid.mustBeOverridden",
-            pause: "fluid.mustBeOverridden"
+            draw: "fluid.notImplemented()"
         },
 
         events: {
@@ -22,9 +21,18 @@
         }
     });
 
+    fluid.defaults("aconite.playable", {
+        gradeNames: "fluid.component",
 
-    fluid.defaults("aconite.immediatelyPlayable", {
-        gradeNames: "aconite.playable",
+        invokers: {
+            play: "fluid.notImplemented()",
+            pause: "fluid.notImplemented()"
+        }
+    });
+
+
+    fluid.defaults("aconite.immediatelyReady", {
+        gradeNames: "fluid.component",
 
         listeners: {
             "onCreate.fireOnReady": "{that}.events.onReady.fire({that})"
@@ -48,29 +56,6 @@
             b: 0.0,
             a: 1.0
         },
-
-        drawableChildOptions: {
-            listeners: {
-                "{animator}.events.onDraw": "{that}.draw()"
-            }
-        },
-
-        playableChildOptions: {
-            listeners: {
-                "{animator}.events.onPlay": "{that}.play()"
-            }
-        },
-
-        distributeOptions: [
-            {
-                source: "{that}.options.drawableChildOptions",
-                target: "{that > aconite.drawable}.options"
-            },
-            {
-                source: "{that}.options.playableChildOptions",
-                target: "{that > aconite.playable}.options"
-            }
-        ],
 
         invokers: {
             draw: {
@@ -193,6 +178,7 @@
     });
 
     // TODO: This is a distinctly bad name for this component!
+    // Perhaps "glContext" or "glEnvironment" or "glProgram"?
     fluid.defaults("aconite.glRenderer", {
         gradeNames: "aconite.glComponent",
 
@@ -228,15 +214,6 @@
                 type: "1i",
                 values: 0
             }
-        }
-    });
-
-
-    fluid.defaults("aconite.drawable", {
-        gradeNames: "fluid.component",
-
-        invokers: {
-            draw: "fluid.mustBeOverridden"
         }
     });
 })();

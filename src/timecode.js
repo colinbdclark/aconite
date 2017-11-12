@@ -105,7 +105,7 @@
      * @return {String} a URL time fragment
      */
     aconite.time.timeFragment = function (timeSpec) {
-        if (timeSpec.inTime === undefined && timeSpec.duration === undefined) {
+        if (!timeSpec || (timeSpec.inTime === undefined && timeSpec.duration === undefined)) {
             return "";
         }
 

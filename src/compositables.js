@@ -66,7 +66,9 @@
         ],
 
         components: {
-            source: {}
+            source: {
+                type: "fluid.mustBeOverridden"
+            }
         },
 
         invokers: {
@@ -79,6 +81,10 @@
                     "{that}.options.bindToTextureUnit"
                 ]
             }
+        },
+
+        events: {
+            onReady: "{source}.events.onReady"
         }
     });
 
@@ -95,9 +101,24 @@
 
     fluid.defaults("aconite.compositableVideo", {
         gradeNames: [
+            "fluid.modelComponent",
             "aconite.playable",
             "aconite.compositable"
         ],
+
+        members: {
+            gl: "{glRenderer}.gl"
+        },
+
+        // TODO: This should be modelized, but aconite.video is broken!
+        url: "",
+
+        model: {
+            loop: false,
+            inTime: null,
+            outTime: null,
+            duration: null
+        },
 
         invokers: {
             play: "{that}.sourcePlayer.play()",
@@ -106,12 +127,30 @@
 
         components: {
             source: {
-                type: "aconite.video"
+                type: "aconite.video",
+                options: {
+                    url: "{compositableVideo}.options.url",
+
+                    // TODO: We can relay the whole model when we sort
+                    // out the issues with URLs in aconite.video.
+                    model: {
+                        inTime: "{compositableVideo}.model.inTime",
+                        outTime: "{compositableVideo}.model.outTime",
+                        duration: "{compositableVideo}.model.duration"
+                    },
+
+                    events: {
+                        onReady: "{compositableVideo}.events.onReady"
+                    }
+                }
             },
 
             sourcePlayer: {
                 type: "aconite.videoPlayer.nativeElement",
                 options: {
+                    model: {
+                        loop: "{compositableVideo}.model.loop"
+                    },
                     components: {
                         video: "{compositableVideo}.source"
                     }
@@ -120,17 +159,7 @@
         },
 
         events: {
-            onReady: "{source}.events.onReady"
+            onReady: null
         }
     });
-
-    fluid.defaults("aconite.compositableVideo.layer", {
-        gradeNames: "aconite.compositableVideo",
-        members: {
-            gl: "{glRenderer}.gl"
-        },
-
-        bindToTextureUnit: "TEXTURE0"
-    });
-
 })();

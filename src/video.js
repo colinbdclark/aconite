@@ -25,7 +25,7 @@
             element: {
                 expander: {
                     funcName: "aconite.video.renderVideoElement",
-                    args: ["{that}", "{that}.model"]
+                    args: ["{that}"]
                 }
             }
         },
@@ -42,7 +42,7 @@
         modelListeners: {
             "*": {
                 funcName: "aconite.video.updateVideoURL",
-                args: ["{that}.element", "{that}.model"],
+                args: ["{that}"],
                 excludeSource: "init"
             }
         },
@@ -54,9 +54,10 @@
         },
 
         listeners: {
-            onCreate: [
-                "aconite.video.bindVideoListeners({that}, {that}.element)"
-            ]
+            "onCreate.bindVideoListeners": {
+                funcName: "aconite.video.bindVideoListeners",
+                args: ["{that}", "{that}.element"]
+            }
         },
 
         templates: {
@@ -64,8 +65,10 @@
         }
     });
 
-    aconite.video.composeURL = function (model) {
-        return model.url + aconite.time.timeFragment(model);
+    aconite.video.composeURL = function (that) {
+        // TODO: The lifecycle of composing URLs is seriously broken!
+        var url = that.model ? that.model.url : that.options.url;
+        return url + aconite.time.timeFragment(that.model);
     };
 
     aconite.video.bindVideoListeners = function (that, video) {
@@ -84,8 +87,8 @@
         });
     };
 
-    aconite.video.renderVideoElement = function (that, model) {
-        var url = aconite.video.composeURL(model),
+    aconite.video.renderVideoElement = function (that) {
+        var url = aconite.video.composeURL(that),
             videoHTML = fluid.stringTemplate(that.options.templates.video, {
                 url: url
             });
@@ -95,8 +98,8 @@
         return video[0];
     };
 
-    aconite.video.updateVideoURL = function (element, model) {
-        element.src = aconite.video.composeURL(model);
+    aconite.video.updateVideoURL = function (that) {
+        that.element.src = aconite.video.composeURL(that);
     };
 
     aconite.video.isReady = function (that, videoEl) {

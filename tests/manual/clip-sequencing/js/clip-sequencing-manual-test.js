@@ -4,7 +4,7 @@
     fluid.defaults("aconite.test.clipSequencingTest", {
         gradeNames: [
             "aconite.animator.debugging",
-            "aconite.videoCompositor.withPlayButton",
+            "aconite.compositor.withPlayButton",
             "aconite.dualVideoSequenceCompositor"
         ],
 

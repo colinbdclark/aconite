@@ -5,7 +5,7 @@
 
     fluid.defaults("aconite.test.multilayerCompositor", {
         gradeNames: [
-            "aconite.videoCompositor.autoPlay",
+            "aconite.compositor.autoPlay",
             "aconite.dualLayerVideoCompositor"
         ],
 
@@ -79,24 +79,10 @@
 
 
     fluid.defaults("aconite.test.multilayerCompositor.layer", {
-        gradeNames: "aconite.compositableVideo.layer",
+        gradeNames: "aconite.compositableVideo",
 
-        // TODO: This material should be moved to top-level options in
-        // aconite.compositableVideo or a similar grade.
-        components: {
-            source: {
-                options: {
-                    url: "{layer}.options.url"
-                }
-            },
-
-            sourcePlayer: {
-                options: {
-                    model: {
-                        loop: true
-                    }
-                }
-            }
+        model: {
+            loop: true
         }
     });
 
@@ -106,6 +92,7 @@
             "aconite.test.multilayerCompositor.layer",
             "aconite.dualLayerVideoCompositor.topLayer"
         ],
+
         url: "../../videos/lichen-01-720p.mp4"
     });
 
@@ -115,6 +102,7 @@
             "aconite.test.multilayerCompositor.layer",
             "aconite.dualLayerVideoCompositor.bottomLayer"
         ],
+
         url: "../../videos/lichen-03-720p.mp4"
     });
 
@@ -140,9 +128,10 @@
         },
 
         listeners: {
-            "{clock}.events.onTick": [
-                "aconite.test.multilayerCompositor.updateUniformModelValue({that}, {multilayerCompositor}, layerBlend)"
-            ]
+            "{clock}.events.onTick": {
+                funcName: "aconite.test.multilayerCompositor.updateUniformModelValue",
+                args: ["{that}", "{multilayerCompositor}", "layerBlend"]
+            }
         }
     });
 })();

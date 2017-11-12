@@ -2,7 +2,7 @@
     "use strict";
 
     fluid.defaults("aconite.test.singleLayerProcessor", {
-        gradeNames: ["aconite.videoCompositor.autoPlay"],
+        gradeNames: ["aconite.compositor.autoPlay"],
 
         model: {
             colourMatrix:  [
@@ -31,29 +31,19 @@
             glRenderer: {
                 type: "aconite.test.singleLayerProcessor.glRenderer"
             }
-        },
-
-        events: {
-            onVideosReady: "{that}.layer.source.events.onReady"
-        },
-
-        listeners: {
-            "onPlay.playLayer": "{layer}.play()"
         }
     });
 
-    fluid.defaults("aconite.test.singleLayerProcessor.videoPlayer", {
-        gradeNames: "aconite.videoPlayer.nativeElement",
-
-        model: {
-            loop: true
-        }
-    });
 
     fluid.defaults("aconite.test.singleLayerProcessor.videoLayer", {
         gradeNames: [
-            "aconite.compositableVideo.layer", "fluid.viewComponent"
+            "aconite.compositableVideo",
+            "fluid.viewComponent"
         ],
+
+        model: {
+            loop: true
+        },
 
         components: {
             source: {
@@ -66,7 +56,7 @@
             },
 
             sourcePlayer: {
-                type: "aconite.test.singleLayerProcessor.videoPlayer",
+                type: "aconite.videoPlayer.nativeElement",
                 container: "{videoLayer}.dom.video"
             }
         },
