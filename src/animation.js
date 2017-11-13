@@ -96,7 +96,6 @@
         },
 
         events: {
-            onReady: null,
             onPlay: null,
             onDraw: null,
             onPause: null

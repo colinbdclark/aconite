@@ -64,10 +64,17 @@
 
         events: {
             onSequenceReady: null,
-            onReady: {
+            afterSequenceReady: null,
+            onPlayersReady: {
                 events: {
                     prerollerReady: "{preroller}.events.onReady",
                     layerReady: "{layer}.events.onReady"
+                }
+            },
+            onReady: {
+                events: {
+                    afterSequenceReady: "{that}.events.afterSequenceReady",
+                    onPlayersReady: "{that}.events.onPlayersReady"
                 }
             },
             onNextClip: null,
@@ -87,9 +94,9 @@
                 args: ["{that}"]
             },
 
-            "onSequenceReady.fireReady": {
+            "onSequenceReady.fireAfterSequenceReady": {
                 priority: "after:prepareForPlay",
-                func: "{that}.events.onReady.fire"
+                func: "{that}.events.afterSequenceReady.fire"
             },
 
             "onPlay.playLayer": "{that}.layer.play()",
@@ -214,7 +221,7 @@
 
         listeners: {
             onCreate: {
-                funcName: "{that}.events.onSequenceReady.fire"
+                func: "{that}.events.onSequenceReady.fire"
             }
         }
     });
@@ -227,7 +234,7 @@
                 type: "aconite.fcpxmlParser",
                 options: {
                     listeners: {
-                        afterParsed: {
+                        "afterParsed.fireOnSequenceReady": {
                             funcName: "{fcpxml}.events.onSequenceReady.fire",
                             args: ["{arguments}.0"]
                         },
@@ -242,20 +249,20 @@
         gradeNames: "aconite.clipSequencer",
 
         listeners: {
-            onSequenceReady: [
-                {
-                    func: "{that}.applier.change",
-                    args: ["clipSequence", {
+            "onSequenceReady.mergeClipSequence": {
+                priority: "before:fireAfterSequenceReady",
+                func: "{that}.applier.change",
+                args: [
+                    "clipSequence",
+
+                    {
                         expander: {
                             funcName: "aconite.clipSequencer.mergeClipParams",
                             args: ["{arguments}.0", "{that}.options.clipParams"]
                         }
-                    }]
-                },
-                {
-                    funcName: "{that}.events.onReady.fire"
-                }
-            ]
+                    }
+                ]
+            }
         }
     });
 })();

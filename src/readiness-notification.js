@@ -40,10 +40,6 @@
             unknownReadinessCounter: "{readinessResponder}.model.unknownReadinessCounter"
         },
 
-        events: {
-            onReady: null
-        },
-
         listeners: {
             "onCreate.incrementCounter": {
                 funcName: "aconite.readinessNotifier.incrementCounter",
