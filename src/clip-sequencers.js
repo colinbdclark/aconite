@@ -29,11 +29,11 @@
         // reached its end and will not be playing.
         //
         // Should we support a second option, "clip loop"?
-        loop: false,
-
+        // TODO: This should be modelized, just like a video.
         model: {
             clipIdx: 0,
-            clipSequence: []
+            clipSequence: [],
+            loop: false
         },
 
         invokers: {
@@ -123,11 +123,11 @@
         aconite.clipSequencer.swapClips(layer.sourcePlayer, preroller, clip.inTime);
     };
 
-    aconite.clipSequencer.nextClip = function (m, loop) {
+    aconite.clipSequencer.nextClip = function (m) {
         var nextIdx = m.clipIdx + 1;
 
         if (nextIdx >= m.clipSequence.length) {
-            if (loop) {
+            if (m.loop) {
                 nextIdx = 0;
             } else {
                 return;
@@ -182,7 +182,7 @@
     aconite.clipSequencer.scheduleNextClip = function (that) {
         var m = that.model,
             idx = m.clipIdx >= m.clipSequence.length ? 0 : m.clipIdx,
-            nextClip = aconite.clipSequencer.nextClip(m, that.options.loop),
+            nextClip = aconite.clipSequencer.nextClip(m),
             currentClip = m.clipSequence[idx];
 
         aconite.clipSequencer.expandClip(currentClip);

@@ -47,7 +47,6 @@
 
         components: {
             source: {
-                type: "aconite.video",
                 options: {
                     members: {
                         element: "{videoLayer}.dom.video.0"
@@ -56,7 +55,6 @@
             },
 
             sourcePlayer: {
-                type: "aconite.videoPlayer.nativeElement",
                 container: "{videoLayer}.dom.video"
             }
         },

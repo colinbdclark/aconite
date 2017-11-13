@@ -87,6 +87,9 @@
         return ((1 / frameRate) * frames) + seconds + (minutes * 60) + (hours * 3600);
     };
 
+    aconite.time.timeRangeNotValid = function (timeSpec) {
+        return (timeSpec.inTime === null || timeSpec.inTime === undefined) && (timeSpec.duration === null || timeSpec.duration === undefined);
+    };
 
     /**
      * Creates a fragment URL for the specified time.
@@ -105,7 +108,7 @@
      * @return {String} a URL time fragment
      */
     aconite.time.timeFragment = function (timeSpec) {
-        if (!timeSpec || (timeSpec.inTime === undefined && timeSpec.duration === undefined)) {
+        if (!timeSpec || aconite.time.timeRangeNotValid(timeSpec)) {
             return "";
         }
 

@@ -12,13 +12,13 @@
     fluid.defaults("aconite.video", {
         gradeNames: "fluid.modelComponent",
 
-        url: "",
-
         model: {
             inTime: null,
             outTime: null,
             duration: null,
-            url: "{that}.options.url"
+            url: null,
+            composedURL: null,
+            rate: 1.0
         },
 
         members: {
@@ -31,20 +31,33 @@
         },
 
         invokers: {
-            setURL: "{that}.applier.change(url, {arguments}.0)",
-
             isReady: {
                 funcName: "aconite.video.isReady",
                 args: ["{that}", "{that}.element"]
             }
         },
 
-        modelListeners: {
-            "*": {
-                funcName: "aconite.video.updateVideoURL",
-                args: ["{that}"],
-                excludeSource: "init"
+        modelRelay: {
+            target: "composedURL",
+            singleTransform: {
+                type: "fluid.transforms.free",
+                func: "aconite.video.composeURL",
+                args: [
+                    "{that}.model.url",
+                    "{that}.model.inTime",
+                    "{that}.model.outTime",
+                    "{that}.model.duration"
+                ]
             }
+        },
+
+        modelListeners: {
+            composedURL: {
+                funcName: "aconite.video.setVideoURL",
+                args: ["{that}.element", "{change}.value"]
+            },
+
+            rate: "aconite.video.updatePlaybackRate({that})"
         },
 
         events: {
@@ -56,50 +69,60 @@
         listeners: {
             "onCreate.bindVideoListeners": {
                 funcName: "aconite.video.bindVideoListeners",
-                args: ["{that}", "{that}.element"]
+                args: ["{that}.events", "{that}.element"]
             }
         },
 
-        templates: {
-            video: "<video src='%url' muted='true'/>"
+        markup: {
+            video: "<video muted='true'/>"
         }
     });
 
-    aconite.video.composeURL = function (that) {
-        // TODO: The lifecycle of composing URLs is seriously broken!
-        var url = that.model ? that.model.url : that.options.url;
-        return url + aconite.time.timeFragment(that.model);
+    aconite.video.composeURL = function (url, inTime, outTime, duration) {
+        if (url === null || url === undefined) {
+            return;
+        }
+
+        var timeSpec = {
+            inTime: inTime,
+            outTime: outTime,
+            duration: duration
+        };
+
+        return url + aconite.time.timeFragment(timeSpec);
     };
 
-    aconite.video.bindVideoListeners = function (that, video) {
+    aconite.video.setVideoURL = function (element, composedURL) {
+        if (composedURL == null || composedURL === undefined) {
+            return;
+        }
+
+        element.src = composedURL;
+    };
+
+    aconite.video.bindVideoListeners = function (events, video) {
         var jVideo = jQuery(video);
 
         jVideo.one("canplay", function () {
-            that.events.onReady.fire(that);
+            events.onReady.fire();
         });
 
         jVideo.bind("canplay", function () {
-            that.events.onVideoLoaded.fire(video);
+            events.onVideoLoaded.fire(video);
         });
 
         jVideo.bind("ended", function () {
-            that.events.onVideoEnded.fire(video);
+            events.onVideoEnded.fire(video);
         });
     };
 
     aconite.video.renderVideoElement = function (that) {
-        var url = aconite.video.composeURL(that),
-            videoHTML = fluid.stringTemplate(that.options.templates.video, {
-                url: url
-            });
-
-        var video = jQuery(videoHTML);
-
+        var video = jQuery(that.options.markup.video);
         return video[0];
     };
 
-    aconite.video.updateVideoURL = function (that) {
-        that.element.src = aconite.video.composeURL(that);
+    aconite.video.updatePlaybackRate = function (that) {
+        that.element.playbackRate = that.model.rate;
     };
 
     aconite.video.isReady = function (that, videoEl) {

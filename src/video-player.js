@@ -18,8 +18,8 @@
             rate: 1.0,
             loop: false,
             isPlaying: false,
-            inTime: 0,
-            outTime: Infinity
+            inTime: null,
+            outTime: null
         },
 
         invokers: {

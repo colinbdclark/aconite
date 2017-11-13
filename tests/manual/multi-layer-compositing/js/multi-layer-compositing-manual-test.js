@@ -78,32 +78,29 @@
     });
 
 
-    fluid.defaults("aconite.test.multilayerCompositor.layer", {
-        gradeNames: "aconite.compositableVideo",
-
-        model: {
-            loop: true
-        }
-    });
-
-
     fluid.defaults("aconite.test.multilayerCompositor.top", {
         gradeNames: [
-            "aconite.test.multilayerCompositor.layer",
+            "aconite.compositableVideo",
             "aconite.dualLayerVideoCompositor.topLayer"
         ],
 
-        url: "../../videos/lichen-01-720p.mp4"
+        model: {
+            loop: true,
+            url: "../../videos/lichen-01-720p.mp4"
+        }
     });
 
 
     fluid.defaults("aconite.test.multilayerCompositor.bottom", {
         gradeNames: [
-            "aconite.test.multilayerCompositor.layer",
+            "aconite.compositableVideo",
             "aconite.dualLayerVideoCompositor.bottomLayer"
         ],
 
-        url: "../../videos/lichen-03-720p.mp4"
+        model: {
+            loop: true,
+            url: "../../videos/lichen-03-720p.mp4"
+        }
     });
 
 
