@@ -47,6 +47,10 @@
             "fluid.viewComponent"
         ],
 
+        model: {
+            isPlaying: false
+        },
+
         // TODO: Replace this with model relay.
         uniformModelMap: {},  // Uniform name : model path
 
@@ -78,7 +82,7 @@
                 type: "aconite.animationClock",
                 options: {
                     listeners: {
-                        onTick: "{animator}.draw"
+                        "onTick.drawAnimator": "{animator}.draw"
                     }
                 }
             },
@@ -116,14 +120,15 @@
                 ]
             },
 
-            "onPlay.startClock": {
-                func: "{that}.clock.start",
-                priority: "last"
+
+            "onPlay.updateModel": {
+                changePath: "isPlaying",
+                value: true
             },
 
-            "onPause.startClock": {
-                func: "{that}.clock.stop",
-                priority: "first"
+            "onPause.updateModel": {
+                changePath: "isPlaying",
+                value: false
             }
         },
 
@@ -158,8 +163,11 @@
     };
 
     aconite.animator.draw = function (that, glRenderer, uniformModelMap, onDraw) {
-        var gl = glRenderer.gl;
+        if (!that.model.isPlaying) {
+            return;
+        }
 
+        var gl = glRenderer.gl;
         aconite.animator.setFrameRateUniforms(that.model, glRenderer, uniformModelMap);
         onDraw(that, glRenderer);
         gl.drawArrays(gl.TRIANGLES, 0, 6);

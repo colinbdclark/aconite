@@ -12,7 +12,21 @@
     "use strict";
 
     fluid.defaults("aconite.animationClock", {
-        gradeNames: "berg.clock.raf"
+        gradeNames: "berg.clock.raf",
+
+        listeners: {
+            // Note: We start the clock and let it run continuously
+            // because Bergson will record the current time
+            // upon initialization, and then time will leap forward
+            // when it starts ticking.
+            //
+            // In between, there is a risk that a scheduler may
+            // start scheduling events before the clock has started,
+            // causing these events to apparently occur immediately
+            // upon the clock starting.
+            // https://github.com/colinbdclark/bergson/issues/15
+            "onCreate.start": "{that}.start()"
+        }
     });
 
 
