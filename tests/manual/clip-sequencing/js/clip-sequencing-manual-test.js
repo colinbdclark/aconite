@@ -70,6 +70,10 @@
                     duration: 10
                 },
                 {
+                    url: "../../videos/4.m4v",
+                    duration: 10
+                },
+                {
                     url: "../../videos/5.m4v",
                     duration: 10
                 },

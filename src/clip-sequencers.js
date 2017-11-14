@@ -110,38 +110,33 @@
         }
     });
 
-    aconite.clipSequencer.swapClips = function (sourcePlayer, preroller, inTime) {
+    aconite.clipSequencer.swapClips = function (sourcePlayer, preroller, clip) {
         var displayEl = sourcePlayer.video.element,
             preRollEl = preroller.element;
 
-        // TODO: This should be done by mutating the video component's model
-        // not by direct property modifications.
-        var parsed = aconite.time.parseTimecode(inTime);
+        // Manually update the currentTime of the video
+        // because time fragments suck.
+        // https://github.com/colinbdclark/aconite/issues/9
+        // TODO: This can be removed when we ditch time fragments.
+        var parsed = aconite.time.parseTimecode(clip.inTime);
         preRollEl.currentTime = isNaN(parsed) ? 0 : parsed;
 
         sourcePlayer.video.element = preRollEl;
         preroller.element = displayEl;
-
-        sourcePlayer.play();
     };
 
-    aconite.clipSequencer.displayClip = function (layer, clip, clipIdx, preroller, onNextClip) {
-        onNextClip.fire(clip, clipIdx);
-        aconite.clipSequencer.swapClips(layer.sourcePlayer, preroller, clip.inTime);
+    aconite.clipSequencer.displayClip = function (that, clip) {
+        that.events.onNextClip.fire(clip);
+        aconite.clipSequencer.swapClips(that.layer.sourcePlayer,
+            that.preroller, clip);
+        that.layer.sourcePlayer.play();
     };
 
-    aconite.clipSequencer.nextClip = function (m) {
-        var nextIdx = m.clipIdx + 1;
-
-        if (nextIdx >= m.clipSequence.length) {
-            if (m.loop) {
-                nextIdx = 0;
-            } else {
-                return;
-            }
-        }
-
-        return m.clipSequence[nextIdx];
+    aconite.clipSequencer.displayNextClip = function (that, nextClip) {
+        var nextClipIdx = that.model.clipIdx + 1;
+        that.applier.change("clipIdx", nextClipIdx);
+        aconite.clipSequencer.displayClip(that, nextClip);
+        aconite.clipSequencer.scheduleNextClip(that);
     };
 
     aconite.clipSequencer.scheduleClipDisplay = function (atTime, nextClip, that) {
@@ -149,9 +144,7 @@
             type: "once",
             time: atTime,
             callback: function () {
-                that.model.clipIdx++;
-                aconite.clipSequencer.displayClip(that.layer, nextClip, that.model.clipIdx, that.preroller, that.events.onNextClip);
-                aconite.clipSequencer.scheduleNextClip(that);
+                aconite.clipSequencer.displayNextClip(that, nextClip);
             }
         });
     };
@@ -185,6 +178,20 @@
         that.applier.change("clipSequence", that.model.clipSequence);
     };
 
+    aconite.clipSequencer.nextClip = function (m) {
+        var nextIdx = m.clipIdx + 1;
+
+        if (nextIdx >= m.clipSequence.length) {
+            if (m.loop) {
+                nextIdx = 0;
+            } else {
+                return;
+            }
+        }
+
+        return m.clipSequence[nextIdx];
+    };
+
     // TODO: Split this up to reduce dependencies.
     aconite.clipSequencer.scheduleNextClip = function (that) {
         var m = that.model,
@@ -206,7 +213,7 @@
         var firstClip = that.model.clipSequence[0];
         aconite.video.assignClip(that.preroller, firstClip);
         aconite.video.assignClip(that.layer.source, firstClip);
-        that.events.onNextClip.fire(firstClip, 0);
+        that.events.onNextClip.fire(firstClip);
     };
 
     aconite.clipSequencer.mergeClipParams = function (clipSequence, defaultParams) {
