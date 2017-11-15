@@ -56,6 +56,8 @@
         gradeNames: "aconite.clipSequencer.static",
 
         model: {
+            loop: true,
+
             clipSequence: [
                 {
                     url: "../../videos/1.m4v",
@@ -96,6 +98,8 @@
         gradeNames: "aconite.clipSequencer.static",
 
         model: {
+            loop: true,
+
             clipSequence: [
                 {
                     url: "../../videos/all.m4v",

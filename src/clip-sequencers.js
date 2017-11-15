@@ -134,6 +134,13 @@
 
     aconite.clipSequencer.displayNextClip = function (that, nextClip) {
         var nextClipIdx = that.model.clipIdx + 1;
+
+        // TODO: Resolve this with the very similar logic below
+        // in several places.
+        if (nextClipIdx >= that.model.clipSequence.length && that.model.loop) {
+            nextClipIdx = 0;
+        }
+
         that.applier.change("clipIdx", nextClipIdx);
         aconite.clipSequencer.displayClip(that, nextClip);
         aconite.clipSequencer.scheduleNextClip(that);
