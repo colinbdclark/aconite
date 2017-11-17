@@ -55,7 +55,10 @@
 
 
     aconite.test.multilayerCompositor.updateUniformModelValue = function (that, tofino, modelPath) {
-        // TODO: This wasn't working as a relay! Why not?
+        // TODO: This doesn't work as a model relay
+        // because of incompatibility between the two requisite
+        // Flocking grade, flock.modelSynth and flock.synth.value.
+        // However this function can and should be factored better!
         that.value();
         fluid.set(tofino.model, modelPath, that.model.value);
     };
