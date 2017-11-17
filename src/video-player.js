@@ -6,7 +6,7 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, berg*/
+/*global berg*/
 
 (function () {
     "use strict";
@@ -18,8 +18,8 @@
             rate: 1.0,
             loop: false,
             isPlaying: false,
-            inTime: 0,
-            outTime: Infinity
+            inTime: null,
+            outTime: null
         },
 
         invokers: {
@@ -41,20 +41,18 @@
             onVideoEnded: "{video}.events.onVideoEnded"
         },
 
+        // TODO: Move this to a base grade that can be shared
+        // with aconite.animator and perhaps other drawables.
         listeners: {
-            onPlay: [
-                {
-                    changePath: "isPlaying",
-                    value: true
-                }
-            ],
+            "onPlay.updateModel": {
+                changePath: "isPlaying",
+                value: true
+            },
 
-            onPause: [
-                {
-                    changePath: "isPlaying",
-                    value: false
-                }
-            ]
+            "onPause.updateModel": {
+                changePath: "isPlaying",
+                value: false
+            }
         },
 
         modelListeners: {
@@ -89,18 +87,14 @@
         gradeNames: "aconite.videoPlayer",
 
         listeners: {
-            onPlay: [
-                {
-                    this: "{that}.video.element",
-                    method: "play"
-                }
-            ],
-            onPause: [
-                {
-                    this: "{that}.video.element",
-                    method: "pause"
-                }
-            ]
+            "onPlay.playVideoElement": {
+                this: "{that}.video.element",
+                method: "play"
+            },
+            "onPause.pauseVideoElement": {
+                this: "{that}.video.element",
+                method: "pause"
+            }
         },
 
         modelListeners: {
@@ -145,21 +139,16 @@
         },
 
         listeners: {
-            "onPlay.startClock": [
-                "{that}.clock.start()"
-            ],
+            "onPlay.startClock": "{that}.clock.start()",
 
-            "onPause.stopClock": [
-                "{that}.clock.stop()"
-            ],
+            "onPause.stopClock": "{that}.clock.stop()",
 
-            "onTick.advanceVideo": [
-                "aconite.videoPlayer.manual.advanceVideo({arguments}.0, {that})"
-            ],
+            "onTick.advanceVideo": {
+                funcName: "aconite.videoPlayer.manual.advanceVideo",
+                args: ["{arguments}.0", "{that}"]
+            },
 
-            onVideoEnded: [
-                "aconite.videoPlayer.manual.end({that})"
-            ]
+            "onVideoEnded.end": "aconite.videoPlayer.manual.end({that})"
         }
     });
 
@@ -198,13 +187,11 @@
         },
 
         listeners: {
-            onPlay: [
-                {
-                    priority: "before:startClock",
-                    funcName: "aconite.videoPlayer.manualOnline.resetPreviousTime",
-                    args: ["{that}"]
-                }
-            ]
+            "onPlay.resetPreviousTime": {
+                priority: "before:startClock",
+                funcName: "aconite.videoPlayer.manualOnline.resetPreviousTime",
+                args: ["{that}"]
+            }
         }
     });
 

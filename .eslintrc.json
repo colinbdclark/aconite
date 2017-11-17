@@ -1,4 +1,8 @@
 {
+  "globals": {
+    "fluid": true,
+    "aconite": true
+  },
   "env": {
     "browser": true,
     "jquery": true

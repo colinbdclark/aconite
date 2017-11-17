@@ -6,8 +6,6 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite*/
-
 (function () {
     "use strict";
 
@@ -62,15 +60,20 @@
 
 
     fluid.defaults("aconite.compositable", {
-        gradeNames: "aconite.texture",
+        gradeNames: [
+            "aconite.drawable",
+            "aconite.texture"
+        ],
 
         components: {
-            source: {}
+            source: {
+                type: "fluid.mustBeOverridden"
+            }
         },
 
         invokers: {
-            refresh: {
-                funcName: "aconite.compositable.refresh",
+            draw: {
+                funcName: "aconite.compositable.draw",
                 args: [
                     "{that}.gl",
                     "{that}.source",
@@ -78,10 +81,14 @@
                     "{that}.options.bindToTextureUnit"
                 ]
             }
+        },
+
+        events: {
+            onReady: "{source}.events.onReady"
         }
     });
 
-    aconite.compositable.refresh = function (gl, source, texture, textureUnit) {
+    aconite.compositable.draw = function (gl, source, texture, textureUnit) {
         if (!source.isReady()) {
             return;
         }
@@ -93,7 +100,19 @@
     };
 
     fluid.defaults("aconite.compositableVideo", {
-        gradeNames: "aconite.compositable",
+        gradeNames: [
+            "fluid.modelComponent",
+            "aconite.playable",
+            "aconite.compositable"
+        ],
+
+        members: {
+            gl: "{glRenderer}.gl"
+        },
+
+        model: {
+            loop: false
+        },
 
         invokers: {
             play: "{that}.sourcePlayer.play()",
@@ -102,27 +121,47 @@
 
         components: {
             source: {
-                type: "aconite.video"
+                type: "aconite.video",
+                options: {
+                    modelRelay: {
+                        source: "{compositableVideo}.model",
+                        target: "{that}.model",
+                        backward: {
+                            excludeSource: "init"
+                        },
+                        singleTransform: {
+                            type: "fluid.transforms.identity"
+                        },
+                    },
+                    model: "{compositableVideo}.model",
+                    events: {
+                        onReady: "{compositableVideo}.events.onReady"
+                    }
+                }
             },
 
             sourcePlayer: {
                 type: "aconite.videoPlayer.nativeElement",
                 options: {
+                    modelRelay: {
+                        source: "{compositableVideo}.model",
+                        target: "{that}.model",
+                        backward: {
+                            excludeSource: "init"
+                        },
+                        singleTransform: {
+                            type: "fluid.transforms.identity"
+                        }
+                    },
                     components: {
                         video: "{compositableVideo}.source"
                     }
                 }
             }
-        }
-    });
-
-    fluid.defaults("aconite.compositableVideo.layer", {
-        gradeNames: "aconite.compositableVideo",
-        members: {
-            gl: "{glRenderer}.gl"
         },
 
-        bindToTextureUnit: "TEXTURE0"
+        events: {
+            onReady: null
+        }
     });
-
 })();

@@ -6,8 +6,6 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, jQuery*/
-
 (function () {
     "use strict";
 

@@ -6,7 +6,7 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, flock, console*/
+/*global flock*/
 
 (function () {
     "use strict";

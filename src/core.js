@@ -6,7 +6,7 @@
  * Distributed under the MIT license.
  */
 
-/*global fluid, aconite, Float32Array*/
+/*global Float32Array*/
 
 (function () {
     "use strict";

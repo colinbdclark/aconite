@@ -1,11 +1,12 @@
-/*global fluid, colin*/
+/*global fluid*/
 
 (function () {
     "use strict";
 
-    fluid.defaults("aconite.test.multilayerTest", {
+    fluid.defaults("aconite.test.multilayerCompositor", {
         gradeNames: [
-            "aconite.videoSequenceCompositor"
+            "aconite.compositor.autoPlay",
+            "aconite.dualLayerVideoCompositor"
         ],
 
         fps: 30,
@@ -25,59 +26,46 @@
 
             clock: {
                 options: {
-                    freq: "{multilayerTest}.options.fps"
+                    freq: "{multilayerCompositor}.options.fps"
                 }
             },
 
             glRenderer: {
-                type: "colin.tofino.glRenderer"
-            },
-
-            // TODO: This suggests that we need
-            // more fine-grained composition of the behaviours
-            // in aconite.videoCompositor.
-            playButton: {
-                type: "fluid.emptySubcomponent"
+                type: "aconite.test.multilayerCompositor.glRenderer"
             },
 
             top: {
-                type: "colin.tofino.topSequencer"
+                type: "aconite.test.multilayerCompositor.top"
             },
 
             bottom: {
-                type: "colin.tofino.bottomSequencer"
+                type: "aconite.test.multilayerCompositor.bottom"
             },
 
             blendModulator: {
-                type: "colin.tofino.videoBlendModulator",
+                type: "aconite.test.multilayerCompositor.videoBlendModulator",
                 options: {
                     components: {
-                        enviro: "{multilayerTest}.enviro"
+                        enviro: "{multilayerCompositor}.enviro"
                     }
                 }
-            }
-        },
-
-        listeners: {
-            // TODO: This should probably be factored out into
-            // an Aconite "play when the videos are ready" grade.
-            "onVideosReady.play": {
-                func: "{that}.events.onPlay.fire"
             }
         }
     });
 
-    fluid.registerNamespace("colin.tofino");
 
-    colin.tofino.updateUniformModelValue = function (that, tofino, modelPath) {
-        // This wasn't working as a relay! Why not?
+    aconite.test.multilayerCompositor.updateUniformModelValue = function (that, tofino, modelPath) {
+        // TODO: This doesn't work as a model relay
+        // because of incompatibility between the two requisite
+        // Flocking grade, flock.modelSynth and flock.synth.value.
+        // However this function can and should be factored better!
         that.value();
         fluid.set(tofino.model, modelPath, that.model.value);
     };
 
 
-    fluid.defaults("colin.tofino.glRenderer", {
-        gradeNames: "aconite.videoCompositor.glRenderer",
+    fluid.defaults("aconite.test.multilayerCompositor.glRenderer", {
+        gradeNames: "aconite.dualLayerVideoCompositor.glRenderer",
 
         shaders: {
             fragment: "shaders/simplified-tofino-shader.frag",
@@ -93,53 +81,36 @@
     });
 
 
-    fluid.defaults("colin.tofino.sequencer", {
-        gradeNames: "aconite.clipSequencer.static",
-
-        loop: true,
+    fluid.defaults("aconite.test.multilayerCompositor.top", {
+        gradeNames: [
+            "aconite.compositableVideo",
+            "aconite.dualLayerVideoCompositor.topLayer"
+        ],
 
         model: {
-            clipSequence: [
-                "{that}.options.clip"
-            ]
-        }
-    });
-
-
-    fluid.defaults("colin.tofino.topSequencer", {
-        gradeNames: "colin.tofino.sequencer",
-
-        clip: {
+            loop: true,
             url: "../../videos/lichen-01-720p.mp4"
-        },
-
-        components: {
-            layer: {
-                type: "aconite.videoCompositor.topLayer"
-            }
         }
     });
 
 
-    fluid.defaults("colin.tofino.bottomSequencer", {
-        gradeNames: "colin.tofino.sequencer",
+    fluid.defaults("aconite.test.multilayerCompositor.bottom", {
+        gradeNames: [
+            "aconite.compositableVideo",
+            "aconite.dualLayerVideoCompositor.bottomLayer"
+        ],
 
-        clip: {
+        model: {
+            loop: true,
             url: "../../videos/lichen-03-720p.mp4"
-        },
-
-        components: {
-            layer: {
-                type: "aconite.videoCompositor.bottomLayer"
-            }
         }
     });
 
 
-    fluid.defaults("colin.tofino.videoBlendModulator", {
+    fluid.defaults("aconite.test.multilayerCompositor.videoBlendModulator", {
         gradeNames: ["flock.synth.frameRate"],
 
-        fps: "{multilayerTest}.options.fps",
+        fps: "{multilayerCompositor}.options.fps",
 
         model: {
             value: 0.5
@@ -157,9 +128,10 @@
         },
 
         listeners: {
-            "{clock}.events.onTick": [
-                "colin.tofino.updateUniformModelValue({that}, {multilayerTest}, layerBlend)"
-            ]
+            "{clock}.events.onTick": {
+                funcName: "aconite.test.multilayerCompositor.updateUniformModelValue",
+                args: ["{that}", "{multilayerCompositor}", "layerBlend"]
+            }
         }
     });
 })();

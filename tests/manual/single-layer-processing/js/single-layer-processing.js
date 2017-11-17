@@ -1,10 +1,8 @@
-/*global fluid*/
-
 (function () {
     "use strict";
 
     fluid.defaults("aconite.test.singleLayerProcessor", {
-        gradeNames: ["aconite.animator"],
+        gradeNames: ["aconite.compositor.autoPlay"],
 
         model: {
             colourMatrix:  [
@@ -24,13 +22,6 @@
             colourMatrix: "colourMatrix"
         },
 
-        invokers: {
-            // TODO:
-            // - harmonize naming
-            // - refactor render as an event.
-            render: "{layer}.refresh()"
-        },
-
         components: {
             layer: {
                 type: "aconite.test.singleLayerProcessor.videoLayer",
@@ -40,39 +31,22 @@
             glRenderer: {
                 type: "aconite.test.singleLayerProcessor.glRenderer"
             }
-        },
-
-        events: {
-            onAllReady: {
-                events: {
-                    onVideoReady: "{that}.layer.source.events.onReady",
-                    onAnimatorReady: "{that}.events.onReady"
-                }
-            }
-        },
-
-        listeners: {
-            onAllReady: [
-                "{that}.play()",
-                "{layer}.play()"
-            ]
         }
     });
 
-    fluid.defaults("aconite.test.singleLayerProcessor.videoPlayer", {
-        gradeNames: "aconite.videoPlayer.nativeElement",
+
+    fluid.defaults("aconite.test.singleLayerProcessor.videoLayer", {
+        gradeNames: [
+            "aconite.compositableVideo",
+            "fluid.viewComponent"
+        ],
 
         model: {
             loop: true
-        }
-    });
-
-    fluid.defaults("aconite.test.singleLayerProcessor.videoLayer", {
-        gradeNames: ["aconite.compositableVideo.layer", "fluid.viewComponent"],
+        },
 
         components: {
             source: {
-                type: "aconite.video",
                 options: {
                     members: {
                         element: "{videoLayer}.dom.video.0"
@@ -81,7 +55,6 @@
             },
 
             sourcePlayer: {
-                type: "aconite.test.singleLayerProcessor.videoPlayer",
                 container: "{videoLayer}.dom.video"
             }
         },
