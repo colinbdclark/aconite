@@ -74,6 +74,7 @@
         },
 
         markup: {
+            // TODO: Modelize the muted attribute.
             video: "<video muted='true'/>"
         }
     });

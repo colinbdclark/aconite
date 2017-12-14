@@ -17,9 +17,7 @@
         model: {
             rate: 1.0,
             loop: false,
-            isPlaying: false,
-            inTime: null,
-            outTime: null
+            isPlaying: false
         },
 
         invokers: {
@@ -67,9 +65,7 @@
     });
 
     aconite.videoPlayer.seekToTime = function (time, that) {
-        if (that.model.seekImmediately) {
-            that.video.element.currentTime = time;
-        }
+        that.video.element.currentTime = time;
     };
 
     aconite.videoPlayer.checkEndTime = function (that) {

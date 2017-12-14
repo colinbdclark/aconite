@@ -26,9 +26,9 @@
         "grunt-contrib-watch": "1.0.0"
     },
     "dependencies": {
-        "infusion": "3.0.0-dev.20171102T191539Z.c0636b395",
+        "infusion": "3.0.0-dev.20171121T212609Z.9b4fde781",
         "bergson": "0.13.1",
-        "flocking": "0.2.0-dev.20170206T221943Z.fb09a52"
+        "flocking": "0.2.0-dev.20171204T033913Z.1a5ae7d"
     },
     "scripts": {
         "prepare": "grunt",

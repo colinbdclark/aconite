@@ -11,6 +11,8 @@
 
     fluid.registerNamespace("aconite");
 
+    // TODO Add a onDestroy listener that calls
+    // gl.deleteTexture()
     fluid.defaults("aconite.texture", {
         gradeNames: "fluid.component",
 
@@ -93,8 +95,12 @@
             return;
         }
 
+        // TODO: These two lines should be split out into
+        // a bind function.
         gl.activeTexture(gl[textureUnit]);
         gl.bindTexture(gl.TEXTURE_2D, texture);
+        //
+
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source.element);
     };
@@ -131,7 +137,7 @@
                         },
                         singleTransform: {
                             type: "fluid.transforms.identity"
-                        },
+                        }
                     },
                     model: "{compositableVideo}.model",
                     events: {
