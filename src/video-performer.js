@@ -37,7 +37,7 @@
         },
 
         components: {
-            video: {
+            source: {
                 type: "aconite.video",
                 options: {
                     gradeNames: ["aconite.videoPerformer.relayingChild"],
@@ -52,7 +52,7 @@
                 options: {
                     gradeNames: ["aconite.videoPerformer.relayingChild"],
                     components: {
-                        video: "{videoPerformer}.video"
+                        video: "{videoPerformer}.source"
                     },
                     listeners: {
                         "{videoPerformer}.events.onPlay": "{that}.play()",

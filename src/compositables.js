@@ -107,9 +107,8 @@
 
     fluid.defaults("aconite.compositableVideo", {
         gradeNames: [
-            "fluid.modelComponent",
-            "aconite.playable",
-            "aconite.compositable"
+            "aconite.compositable",
+            "aconite.videoPerformer"
         ],
 
         members: {
@@ -118,56 +117,6 @@
 
         model: {
             loop: false
-        },
-
-        invokers: {
-            play: "{that}.sourcePlayer.play()",
-            pause: "{that}.sourcePlayer.pause()"
-        },
-
-        components: {
-            source: {
-                type: "aconite.video",
-                options: {
-                    modelRelay: {
-                        source: "{compositableVideo}.model",
-                        target: "{that}.model",
-                        backward: {
-                            excludeSource: "init"
-                        },
-                        singleTransform: {
-                            type: "fluid.transforms.identity"
-                        }
-                    },
-                    model: "{compositableVideo}.model",
-                    events: {
-                        onReady: "{compositableVideo}.events.onReady"
-                    }
-                }
-            },
-
-            sourcePlayer: {
-                type: "aconite.videoPlayer.nativeElement",
-                options: {
-                    modelRelay: {
-                        source: "{compositableVideo}.model",
-                        target: "{that}.model",
-                        backward: {
-                            excludeSource: "init"
-                        },
-                        singleTransform: {
-                            type: "fluid.transforms.identity"
-                        }
-                    },
-                    components: {
-                        video: "{compositableVideo}.source"
-                    }
-                }
-            }
-        },
-
-        events: {
-            onReady: null
         }
     });
 })();

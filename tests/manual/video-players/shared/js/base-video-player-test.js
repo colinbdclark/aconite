@@ -8,7 +8,7 @@
         ],
 
         components: {
-            video: {
+            source: {
                 options: {
                     members: {
                         element: "{videoPlayerTest}.dom.video.0"

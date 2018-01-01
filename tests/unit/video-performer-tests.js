@@ -54,7 +54,7 @@ var fluid = fluid || require("infusion"),
                                 funcName: "jqUnit.assertTrue",
                                 args: [
                                     "loop should be true on the video component.",
-                                    "{videoPerformer}.video.model.loop"
+                                    "{videoPerformer}.source.model.loop"
                                 ]
                             },
                             {
@@ -85,7 +85,7 @@ var fluid = fluid || require("infusion"),
                                 funcName: "jqUnit.assertFalse",
                                 args: [
                                     "loop should be false on the video component.",
-                                    "{videoPerformer}.video.model.loop"
+                                    "{videoPerformer}.source.model.loop"
                                 ]
                             },
                             {
@@ -110,7 +110,7 @@ var fluid = fluid || require("infusion"),
                                 funcName: "jqUnit.assertTrue",
                                 args: [
                                     "loop should be true on the video component.",
-                                    "{videoPerformer}.video.model.loop"
+                                    "{videoPerformer}.source.model.loop"
                                 ]
                             },
                             {
