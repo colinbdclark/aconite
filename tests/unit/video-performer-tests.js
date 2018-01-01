@@ -54,14 +54,14 @@ var fluid = fluid || require("infusion"),
                                 funcName: "jqUnit.assertTrue",
                                 args: [
                                     "loop should be true on the video component.",
-                                    "{videoPerformer}.source.model.loop"
+                                    "{videoPerformer}.video.model.loop"
                                 ]
                             },
                             {
                                 funcName: "jqUnit.assertTrue",
                                 args: [
                                     "loop should be true on the videoPlayer component.",
-                                    "{videoPerformer}.sourcePlayer.model.loop"
+                                    "{videoPerformer}.player.model.loop"
                                 ]
                             }
                         ]
@@ -85,14 +85,14 @@ var fluid = fluid || require("infusion"),
                                 funcName: "jqUnit.assertFalse",
                                 args: [
                                     "loop should be false on the video component.",
-                                    "{videoPerformer}.source.model.loop"
+                                    "{videoPerformer}.video.model.loop"
                                 ]
                             },
                             {
                                 funcName: "jqUnit.assertFalse",
                                 args: [
                                     "loop should be false on the videoPlayer component.",
-                                    "{videoPerformer}.sourcePlayer.model.loop"
+                                    "{videoPerformer}.player.model.loop"
                                 ]
                             },
                             {
@@ -110,14 +110,14 @@ var fluid = fluid || require("infusion"),
                                 funcName: "jqUnit.assertTrue",
                                 args: [
                                     "loop should be true on the video component.",
-                                    "{videoPerformer}.source.model.loop"
+                                    "{videoPerformer}.video.model.loop"
                                 ]
                             },
                             {
                                 funcName: "jqUnit.assertTrue",
                                 args: [
                                     "loop should be true on the videoPlayer component.",
-                                    "{videoPerformer}.sourcePlayer.model.loop"
+                                    "{videoPerformer}.player.model.loop"
                                 ]
                             }
                         ]
