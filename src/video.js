@@ -2,7 +2,7 @@
  * Aconite Video
  * http://github.com/colinbdclark/aconite
  *
- * Copyright 2013-2015, Colin Clark
+ * Copyright 2013-2018, Colin Clark
  * Distributed under the MIT license.
  */
 
@@ -13,12 +13,12 @@
         gradeNames: "fluid.modelComponent",
 
         model: {
-            inTime: null,
-            outTime: null,
-            duration: null,
-            url: null,
-            composedURL: null,
-            rate: 1.0
+            inTime: 0,
+            outTime: undefined,
+            duration: undefined,
+            url: undefined,
+            rate: 1.0,
+            muted: true
         },
 
         members: {
@@ -37,27 +37,35 @@
             }
         },
 
-        modelRelay: {
-            target: "composedURL",
-            singleTransform: {
-                type: "fluid.transforms.free",
-                func: "aconite.video.composeURL",
-                args: [
-                    "{that}.model.url",
-                    "{that}.model.inTime",
-                    "{that}.model.outTime",
-                    "{that}.model.duration"
-                ]
-            }
-        },
-
         modelListeners: {
-            composedURL: {
-                funcName: "aconite.video.setVideoURL",
-                args: ["{that}.element", "{change}.value"]
+            muted: {
+                funcName: "aconite.video.setAttribute",
+                args: ["{that}", "muted", "{change}.value"]
             },
 
-            rate: "aconite.video.updatePlaybackRate({that})"
+            inTime: {
+                funcName: "aconite.video.setAttribute",
+                args: ["{that}", "currentTime", "{change}.value"]
+            },
+
+            rate: {
+                funcName: "aconite.video.setAttribute",
+                args: ["{that}", "playbackRate", "{change}.value"]
+            },
+
+            url: [
+                {
+                    funcName: "aconite.video.setAttribute",
+                    args: ["{that}", "src", "{change}.value"]
+                },
+
+                // Whenever the video's src changes,
+                // we always need to update the currentTime.
+                {
+                    funcName: "aconite.video.setAttribute",
+                    args: ["{that}", "currentTime", "{that}.model.inTime"]
+                }
+            ]
         },
 
         events: {
@@ -74,32 +82,9 @@
         },
 
         markup: {
-            // TODO: Modelize the muted attribute.
-            video: "<video muted='true'/>"
+            video: "<video />"
         }
     });
-
-    aconite.video.composeURL = function (url, inTime, outTime, duration) {
-        if (url === null || url === undefined) {
-            return;
-        }
-
-        var timeSpec = {
-            inTime: inTime,
-            outTime: outTime,
-            duration: duration
-        };
-
-        return url + aconite.time.timeFragment(timeSpec);
-    };
-
-    aconite.video.setVideoURL = function (element, composedURL) {
-        if (composedURL == null || composedURL === undefined) {
-            return;
-        }
-
-        element.src = composedURL;
-    };
 
     aconite.video.bindVideoListeners = function (events, video) {
         var jVideo = jQuery(video);
@@ -122,15 +107,25 @@
         return video[0];
     };
 
-    aconite.video.updatePlaybackRate = function (that) {
-        that.element.playbackRate = that.model.rate;
-    };
-
     aconite.video.isReady = function (that, videoEl) {
         return videoEl && videoEl.readyState === 4;
     };
 
-    aconite.video.assignClip = function (vid, clip) {
-        vid.applier.change("", clip);
+    aconite.video.assignClip = function (that, clip) {
+        that.applier.change("", clip);
+    };
+
+    aconite.video.setAttribute = function (that, propName, value) {
+        // TODO: This may be problematic in future cases where
+        // one might legitimately want to clear out an attribute,
+        // but it is here in order to deal with the fact that it's
+        // possible to legitimately have a video for which we don't want
+        // to set an attribute at all.
+        // (e.g. because a pre-existing video element is specified).
+        if (value === null || value === undefined) {
+            return;
+        }
+
+        that.element[propName] = value;
     };
 })();

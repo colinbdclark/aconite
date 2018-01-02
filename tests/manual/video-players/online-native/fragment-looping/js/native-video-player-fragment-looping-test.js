@@ -6,8 +6,8 @@
 
         model: {
             loop: true,
-            inTime: 0.5,
-            outTime: 0.7
+            inTime: 5,
+            outTime: 7
         }
     });
 })();

@@ -38,6 +38,22 @@
             parsedInTime + aconite.time.parseTimecode(timeSpec.duration, timeSpec.frameRate);
     };
 
+    // TODO: Turn this into a model transform.
+    aconite.time.duration = function (timeSpec) {
+        var inTime = aconite.time.inTime(timeSpec),
+            outTime = aconite.time.outTime(timeSpec, inTime);
+
+        return outTime - inTime;
+    };
+
+    // TODO: Turn this into a model transform.
+    aconite.time.timeUntilEnd = function (videoCurrentTime, timeSpec) {
+        var inTime = aconite.time.inTime(timeSpec),
+            outTime = aconite.time.outTime(timeSpec, inTime);
+
+        return outTime - videoCurrentTime;
+    };
+
     /**
      * Parses a SMPTE timecode string in the format 'hh:mm:ss' or 'hh:mm:ss:ff'
      * and returns the number of seconds it represents.
