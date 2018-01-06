@@ -46,6 +46,7 @@ module.exports = function (grunt) {
             "src/animation.js",
             "src/compositor.js",
             "src/video.js",
+            "src/video-timeline-notifier.js",
             "src/video-player.js",
             "src/video-performer.js",
             "src/compositables.js",

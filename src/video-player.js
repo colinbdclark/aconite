@@ -11,6 +11,63 @@
 (function () {
     "use strict";
 
+    fluid.defaults("aconite.videoTimelineNotifier", {
+        gradeNames: "fluid.component",
+
+        components: {
+            clock: {
+                type: "berg.clock.raf"
+            },
+
+            video: {
+                type: "aconite.video"
+            }
+        },
+
+        invokers: {
+            start: {
+                func: "{clock}.start"
+            },
+
+            stop: {
+                func: "{clock}.stop"
+            },
+
+            checkCurrentTime: {
+                funcName: "aconite.videoTimelineNotifier.checkCurrentTime",
+                args: ["{that}"]
+            }
+        },
+
+        events: {
+            onClipIn: null,
+            onTick: "{clock}.events.onTick",
+            onClipOut: null,
+        },
+
+        listeners: {
+            "onTick.checkCurrentTime": {
+                func: "{that}.checkCurrentTime"
+            }
+        }
+    });
+
+    aconite.videoTimelineNotifier.checkCurrentTime = function (that) {
+        var videoTime = that.video.element.currentTime,
+            m = that.video.model;
+
+        // TODO: This algorithm will fail in cases where
+        // outTime hasn't been set. We need to be able to
+        // take the video's duration into account as well.
+        // TODO: We may want to test whether we're within
+        // the range of in/out time by less than a tick's duration.
+        if (videoTime <= m.inTime) {
+            that.events.onClipIn.fire(videoTime);
+        } else if (videoTime >= m.outTime) {
+            that.events.onClipOut.fire(videoTime);
+        }
+    };
+
     fluid.defaults("aconite.videoPlayer", {
         gradeNames: "fluid.modelComponent",
 
@@ -23,12 +80,7 @@
         invokers: {
             play: "{that}.events.onPlay.fire()",
 
-            pause: "{that}.events.onPause.fire()",
-
-            handleOutPoint: {
-                funcName: "aconite.videoPlayer.handleOutPoint",
-                args: ["{that}"]
-            }
+            pause: "{that}.events.onPause.fire()"
         },
 
         components: {
@@ -80,13 +132,6 @@
         }
     };
 
-    aconite.videoPlayer.handleOutPoint = function (that) {
-        if (that.model.loop) {
-            aconite.videoPlayer.seekToTime(that.model.inTime, that);
-        } else {
-            that.pause();
-        }
-    };
 
     /**
      * A Video Player that uses the underlying HTML video element's
@@ -95,49 +140,43 @@
     fluid.defaults("aconite.videoPlayer.nativeElement", {
         gradeNames: "aconite.videoPlayer",
 
-        // TODO: We should consolidate these components
-        // somewhere where they can be shared across all
-        // actors in an animation.
         components: {
-            scheduler: {
-                type: "berg.scheduler",
+            timelineNotifier: {
+                type: "aconite.videoTimelineNotifier",
                 options: {
                     components: {
-                        clock: {
-                            type: "berg.clock.raf"
-                        }
+                        video: "{nativeElement}.video"
+                    },
+
+                    events: {
+                        onClipIn: "{nativeElement}.events.onClipIn",
+                        onClipOut: "{nativeElement}.events.onClipOut"
                     }
                 }
             }
         },
 
-        members: {
-            scheduledOutPointAction: {
-                type: "repeat",
-                time: 0,
-                freq: 0,
-                callback: "{that}.handleOutPoint"
-            }
+        events: {
+            onClipIn: null,
+            onClipOut: null
         },
 
         listeners: {
-            "onPlay.startClock": {
-                func: "{scheduler}.clock.start"
+            "onPlay.playVideoElement": {
+                this: "{that}.video.element",
+                method: "play"
             },
 
-            // TODO: This should be bound to the promise resolution
-            // caused by videoElement.play() actually starting playing;
-            // hence an "afterPlay" event is likely required.
-            "onPlay.scheduleOutPointAction": {
-                priority: "after:startClock",
-                funcName: "aconite.videoPlayer.nativeElement.scheduleOutPointAction",
+            "onPlay.startNotifier": "{that}.timelineNotifier.start()",
+
+            "onClipIn.handleInPoint": {
+                funcName: "aconite.videoPlayer.nativeElement.inPoint",
                 args: ["{that}"]
             },
 
-            "onPlay.playVideoElement": {
-                priority: "after:scheduleOutPointAction",
-                this: "{that}.video.element",
-                method: "play"
+            "onClipOut.handleOutPoint": {
+                funcName: "aconite.videoPlayer.nativeElement.outPoint",
+                args: ["{that}"]
             },
 
             "onPause.pauseVideoElement": {
@@ -145,16 +184,7 @@
                 method: "pause"
             },
 
-            "onPause.cancelOutPointAction": {
-                priority: "after:pauseVideoElement",
-                funcName: "aconite.videoPlayer.nativeElement.cancelOutPointAction",
-                args: ["{that}"]
-            },
-
-            "onPause.stopClock": {
-                priority: "after:cancelLoop",
-                func: "{scheduler}.clock.stop"
-            }
+            "onPause.stopNotifier": "{that}.timelineNotifier.stop()"
         },
 
         modelListeners: {
@@ -179,31 +209,35 @@
             (!m.duration || m.duration === vidDur);
     };
 
-    aconite.videoPlayer.nativeElement.scheduleOutPointAction = function (that) {
-        // We don't need to manually schedule the out point event
-        // if we:
-        // 1. are not looping and
-        // 2. don't have an early outTime or a late inTime
-        if (!that.model.loop &&
-            aconite.videoPlayer.nativeElement.canLoopNatively(that)) {
-            return;
+    aconite.videoPlayer.nativeElement.inPoint = function (that) {
+        var vidEl = that.video.element;
+
+        if (vidEl.playbackRate < 0) {
+            // We're playing backwards.
+            if (that.model.loop) {
+                if (!aconite.videoPlayer.nativeElement.canLoopNatively(that)) {
+                    // Loop back to the out point.
+                    vidEl.currentTime = that.video.model.outTime;
+                }
+            } else {
+                that.pause();
+            }
         }
-
-        aconite.videoPlayer.nativeElement.cancelOutPointAction(that);
-
-        // TODO: This should be implemented more efficiently,
-        // using values that are parsed via a model relay.
-        var endTime = aconite.time.timeUntilEnd(that.video.element.currentTime,
-            that.model);
-        var loopDuration = 1.0 / aconite.time.duration(that.model);
-        that.scheduledOutPointAction.time = endTime;
-        that.scheduledOutPointAction.freq = loopDuration;
-
-        that.scheduler.schedule(that.scheduledOutPointAction);
     };
 
-    aconite.videoPlayer.nativeElement.cancelOutPointAction = function (that) {
-        that.scheduler.clear(that.scheduledOutPointAction);
+    aconite.videoPlayer.nativeElement.outPoint = function (that) {
+        var vidEl = that.video.element;
+
+        if (vidEl.playbackRate > 0) {
+            if (that.model.loop) {
+                if (!aconite.videoPlayer.nativeElement.canLoopNatively(that)) {
+                    // Loop back to the out point.
+                    vidEl.currentTime = that.video.model.inTime;
+                }
+            } else {
+                that.pause();
+            }
+        }
     };
 
     /**
@@ -239,7 +273,10 @@
                 args: ["{arguments}.0", "{that}"]
             },
 
-            "onVideoEnded.handleOut": "aconite.videoPlayer.handleOutPoint({that})"
+            "onVideoEnded.handleOutPoint": {
+                funcName: "aconite.videoPlayer.manual.handleOutPoint",
+                args: ["{that}"]
+            }
         }
     });
 
@@ -259,6 +296,14 @@
         aconite.videoPlayer.checkEndTime(that);
     };
 
+
+    aconite.videoPlayer.manual.handleOutPoint = function (that) {
+        if (that.model.loop) {
+            aconite.videoPlayer.seekToTime(that.model.inTime, that);
+        } else {
+            that.pause();
+        }
+    };
 
     fluid.defaults("aconite.videoPlayer.manualOnline", {
         gradeNames: "aconite.videoPlayer.manual",
