@@ -1,37 +1,40 @@
 {
-    "name": "aconite",
-    "version": "0.7.0",
-    "description": "A framework for creative video and image processing on the web.",
-    "author": "Colin Clark",
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/colinbdclark/aconite.git"
-    },
-    "bugs": "http://github.com/colinbdclark/aconite/issues",
-    "license": "MIT",
-    "keywords": [
-        "video",
-        "compositing",
-        "webgl"
-    ],
-    "readmeFilename": "README.md",
-    "devDependencies": {
-        "jquery": "3.2.1",
-        "grunt": "1.0.1",
-        "grunt-contrib-uglify": "3.1.0",
-        "grunt-contrib-clean": "1.1.0",
-        "grunt-contrib-copy": "1.0.0",
-        "grunt-contrib-concat": "1.0.1",
-        "fluid-grunt-eslint": "18.1.2",
-        "grunt-contrib-watch": "1.0.0"
-    },
-    "dependencies": {
-        "infusion": "3.0.0-dev.20171102T191539Z.c0636b395",
-        "bergson": "0.13.1",
-        "flocking": "0.2.0-dev.20170206T221943Z.fb09a52"
-    },
-    "scripts": {
-        "prepare": "grunt",
-        "test": "testem ci --file tests/unit/testem.json"
-    }
+  "name": "aconite",
+  "version": "0.7.0",
+  "description": "A framework for creative video and image processing on the web.",
+  "author": "Colin Clark",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/colinbdclark/aconite.git"
+  },
+  "bugs": "http://github.com/colinbdclark/aconite/issues",
+  "license": "MIT",
+  "keywords": [
+    "video",
+    "compositing",
+    "webgl"
+  ],
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "jquery": "3.2.1",
+    "grunt": "1.0.1",
+    "grunt-contrib-uglify": "3.1.0",
+    "grunt-contrib-clean": "1.1.0",
+    "grunt-contrib-copy": "1.0.0",
+    "grunt-contrib-concat": "1.0.1",
+    "fluid-grunt-eslint": "18.1.2",
+    "grunt-contrib-watch": "1.0.0"
+  },
+  "dependencies": {
+    "infusion": "3.0.0-dev.20171102T191539Z.c0636b395",
+    "bergson": "0.13.1",
+    "flocking": "0.2.0-dev.20170206T221943Z.fb09a52",
+    "snyk": "^1.88.0"
+  },
+  "scripts": {
+    "prepare": "npm run snyk-protect; grunt",
+    "test": "testem ci --file tests/unit/testem.json",
+    "snyk-protect": "snyk protect"
+  },
+  "snyk": true
 }
