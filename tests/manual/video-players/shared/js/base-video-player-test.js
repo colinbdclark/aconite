@@ -14,11 +14,17 @@
                         element: "{videoPlayerTest}.dom.video.0"
                     }
                 }
-            }
-        },
+            },
 
-        listeners: {
-            "onReady.play": "{that}.play()"
+            playButton: {
+                type: "aconite.ui.playButtonOverlay",
+                container: ".aconite-animator-play",
+                options: {
+                    listeners: {
+                        onPlay: "{videoPlayerTest}.play()"
+                    }
+                }
+            }
         },
 
         selectors: {

@@ -27,7 +27,6 @@
                     "{that}.container",
                     "{that}.events.onActivated.fire",
                     "{that}.events.onPlay.fire",
-                    "{that}.options.selectors.fullScreen",
                     "{that}.options.playDelay"
                 ]
             }
@@ -35,41 +34,68 @@
 
         events: {
             onActivated: null,
-            onPlay: null,
+            onPlay: null
+        },
+
+        listeners: {
+            "onCreate.showButton": {
+                "this": "{that}.container",
+                method: "css",
+                args: ["display", "inline"]
+            },
+
+            "onCreate.bindClick": {
+                "this": "{that}.container",
+                method: "click",
+                args: ["{that}.play"]
+            },
+
+            "onPlay.hideButton": {
+                "this": "{that}.container",
+                method: "hide"
+            }
+        }
+    });
+
+    aconite.ui.playButtonOverlay.play = function (playButton, onActivated, onPlay, fullScreenSel, playDelay) {
+        onActivated();
+        setTimeout(onPlay, playDelay * 1000);
+    };
+
+    aconite.ui.playButtonOverlay.toggleCursor = function (fullScreenSel, styles) {
+        var el = jQuery(fullScreenSel);
+        el.toggleClass(styles.fullScreen);
+    };
+
+
+    fluid.defaults("aconite.ui.playButtonOverlay.fullScreen", {
+        gradeNames: "aconite.ui.playButtonOverlay",
+
+        events: {
             onFullScreenChange: null
         },
 
         listeners: {
-            onCreate: [
-                {
-                    "this": "{that}.container",
-                    method: "css",
-                    args: ["display", "inline"]
-                },
-                {
-                    "this": "{that}.container",
-                    method: "click",
-                    args: ["{that}.play"]
-                },
-
-                {
-                    funcName: "aconite.ui.playButtonOverlay.bindFullScreenListener",
-                    args: [
-                        "{that}.options.selectors.fullScreen",
-                        "{that}.events.onFullScreenChange.fire"
-                    ]
-                }
-            ],
-
-            onPlay: {
-                "this": "{that}.container",
-                method: "hide"
+            "onCreate.bindListener": {
+                funcName: "aconite.ui.playButtonOverlay.fullScreen.bindListener",
+                args: [
+                    "{that}.options.selectors.fullScreen",
+                    "{that}.events.onFullScreenChange.fire"
+                ]
             },
 
-            onFullScreenChange: {
+            "onActivated.requestFullScreen": {
+                funcName: "aconite.ui.playButtonOverlay.fullScreen.requestFullScreen",
+                args: [
+                    "{that}.options.selectors.fullScreen"
+                ]
+            },
+
+            "onFullScreenChange.toggleCursorStyle": {
                 funcName: "aconite.ui.playButtonOverlay.toggleCursor",
                 args: ["{that}.options.selectors.fullScreen", "{that}.options.styles"]
             }
+
         },
 
         selectors: {
@@ -81,37 +107,27 @@
         }
     });
 
-    aconite.ui.playButtonOverlay.fullScreenEventNames = [
+    aconite.ui.playButtonOverlay.fullScreen.eventNames = [
         "fullscreenchange",
         "webkitfullscreenchange",
         "mozfullscreenchange",
         "msfullscreenchange"
     ];
 
-    aconite.ui.playButtonOverlay.bindFullScreenListener = function (fullScreenSel, onFullScreenChange) {
+    aconite.ui.playButtonOverlay.fullScreen.bindListener = function (fullScreenSel, onFullScreenChange) {
         var el = document.querySelector(fullScreenSel);
 
-        fluid.each(aconite.ui.playButtonOverlay.fullScreenEventNames, function (eventName) {
+        fluid.each(aconite.ui.playButtonOverlay.fullScreen.eventNames, function (eventName) {
             el.addEventListener(eventName, onFullScreenChange);
         });
     };
 
-    aconite.ui.playButtonOverlay.play = function (playButton, onActivated, onPlay, fullScreenSel, playDelay) {
+    aconite.ui.playButtonOverlay.fullScreen.requestFullScreen = function (fullScreenSel) {
         var jEl = jQuery(fullScreenSel),
             el = jEl[0],
             rfs = el.webkitRequestFullScreen ? "webkitRequestFullScreen" :
-                el.mozRequestFullScreen ? "mozRequestFullScreen" : "requestFullScreen";
-
-        onActivated();
+            el.mozRequestFullScreen ? "mozRequestFullScreen" : "requestFullScreen";
 
         el[rfs]();
-
-        setTimeout(onPlay, playDelay * 1000);
     };
-
-    aconite.ui.playButtonOverlay.toggleCursor = function (fullScreenSel, styles) {
-        var el = jQuery(fullScreenSel);
-        el.toggleClass(styles.fullScreen);
-    };
-
 })();

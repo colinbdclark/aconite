@@ -22,18 +22,8 @@
         model: {},
 
         invokers: {
-            // TODO: These invokers can be replaced with:
-            //
-            // play: "{that}.player.play()",
-            // pause: "{that}.player.pause()"
-            //
-            // when an Infusion bug is fixed. In the meantime,
-            // this indirection is required to avoid model relaying issues
-            // between this component and its children by ensuring that the
-            // player doesn't get created too soon—and thus the parent's model
-            // values are correctly pushed to the children.
-            play: "{that}.events.onPlay.fire()",
-            pause: "{that}.events.onPause.fire()"
+            play: "{that}.player.play()",
+            pause: "{that}.player.pause()"
         },
 
         components: {
@@ -53,10 +43,6 @@
                     gradeNames: ["aconite.videoPerformer.relayingChild"],
                     components: {
                         video: "{videoPerformer}.source"
-                    },
-                    listeners: {
-                        "{videoPerformer}.events.onPlay": "{that}.play()",
-                        "{videoPerformer}.events.onPause": "{that}.pause()"
                     }
                 }
             }

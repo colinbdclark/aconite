@@ -26,12 +26,14 @@
     };
 
     // Unsupported, non-API function.
-    aconite.time.inTime = function (timeSpec) {
-        var inTime = aconite.time.parseTimecode(timeSpec.inTime, timeSpec.frameRate);
+    // TODO: Move this to video.js
+    aconite.time.inTime = function (inTime, frameRate) {
+        var inTime = aconite.time.parseTimecode(inTime, frameRate);
         return isNaN(inTime) ? 0 : inTime;
     };
 
     // Unsupported, non-API function.
+    // TODO: This function has no clients. Can it be removed?
     aconite.time.outTime = function (timeSpec, parsedInTime) {
         return timeSpec.outTime !== undefined ?
             aconite.time.parseTimecode(timeSpec.outTime, timeSpec.frameRate) :
@@ -39,19 +41,12 @@
     };
 
     // TODO: Turn this into a model transform.
+    // TODO: This function has no clients. Can it be removed?
     aconite.time.duration = function (timeSpec) {
-        var inTime = aconite.time.inTime(timeSpec),
+        var inTime = aconite.time.inTime(timeSpec.inTime, timeSpec.frameRate),
             outTime = aconite.time.outTime(timeSpec, inTime);
 
         return outTime - inTime;
-    };
-
-    // TODO: Turn this into a model transform.
-    aconite.time.timeUntilEnd = function (videoCurrentTime, timeSpec) {
-        var inTime = aconite.time.inTime(timeSpec),
-            outTime = aconite.time.outTime(timeSpec, inTime);
-
-        return outTime - videoCurrentTime;
     };
 
     /**
@@ -70,6 +65,8 @@
         var type = typeof timecode;
         if (type === "number") {
             return timecode;
+        } else if (type === "undefined") {
+            return undefined;
         } else if (type !== "string") {
             return NaN;
         }
@@ -129,7 +126,7 @@
         }
 
         var frag = "#t=",
-            inTime = aconite.time.inTime(timeSpec),
+            inTime = aconite.time.inTime(timeSpec.inTime, timeSpec.frameRate),
             outTime = aconite.time.outTime(timeSpec, inTime);
 
         frag += inTime;

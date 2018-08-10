@@ -56,14 +56,12 @@
         var videoTime = that.video.element.currentTime,
             m = that.video.model;
 
-        // TODO: This algorithm will fail in cases where
-        // outTime hasn't been set. We need to be able to
-        // take the video's duration into account as well.
         // TODO: We may want to test whether we're within
         // the range of in/out time by less than a tick's duration.
-        if (videoTime <= m.inTime) {
+        if (videoTime <= m.inTimeSecs) {
             that.events.onClipIn.fire(videoTime);
-        } else if (videoTime >= m.outTime) {
+        } else if ((m.outTimeSecs && videoTime >= m.outTimeSecs) ||
+            videoTime >= m.totalDuration) {
             that.events.onClipOut.fire(videoTime);
         }
     };

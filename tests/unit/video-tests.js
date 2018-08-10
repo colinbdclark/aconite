@@ -22,8 +22,9 @@ var fluid = fluid || require("infusion"),
                 options: {
                     model: {
                         url: "../videos/lichen-03-720p.mp4",
-                        inTime: 0.1,
-                        outTime: 0.2
+                        inTime: "00:00:00:03",
+                        outTime: 0.2,
+                        frameRate: 30
                     }
                 }
             },
@@ -110,7 +111,7 @@ var fluid = fluid || require("infusion"),
                             {
                                 funcName: "aconite.test.video.tester.assertRelativeURLEquals",
                                 args: [
-                                    "The playbackRate attribute should be 1.0.",
+                                    "The src attribute should correspond to the URL specified in the model at creation time.",
                                     "../videos/lichen-03-720p.mp4",
                                     "{video}.element.src"
                                 ]
@@ -166,11 +167,26 @@ var fluid = fluid || require("infusion"),
                                 ]
                             }
                         ]
+                    },
+                    {
+                        name: "totalDuration is set correctly to the video's duration.",
+                        expect: 2,
+                        sequence: [
+                            {
+                                funcName: "aconite.test.video.tester.testDuration",
+                                args: ["{video}"]
+                            }
+                        ]
                     }
                 ]
             }
         ]
     });
+
+    aconite.test.video.tester.testDuration = function (video) {
+        jqUnit.assertNotUndefined("The totalDuration should not be undefined", video.model.totalDuration);
+        jqUnit.assertEquals("The totalDuration model property should match the video's duration.", video.element.duration, video.model.totalDuration);
+    };
 
     aconite.test.video.tester.getAbsoluteURL = function (url) {
         var link = document.createElement("a");
@@ -184,5 +200,96 @@ var fluid = fluid || require("infusion"),
         jqUnit.assertEquals(msg, absoluteExpected, actual);
     };
 
+    fluid.defaults("aconite.test.video.modelRelays.testEnvironment", {
+        gradeNames: "fluid.test.testEnvironment",
+
+        components: {
+            allTimeCodeVideo: {
+                type: "aconite.video",
+                options: {
+                    model: {
+                        url: "../videos/lichen-03-720p.mp4",
+                        inTime: "00:00:00:03",
+                        outTime: "00:00:00:06",
+                        frameRate: 30
+                    }
+                }
+            },
+
+            noOutTimeVideo: {
+                type: "aconite.video",
+                options: {
+                    model: {
+                        url: "../videos/lichen-01-720p.mp4",
+                        inTime: "00:00:00:03",
+                        frameRate: 30
+                    }
+                }
+            },
+
+            tester: {
+                type: "aconite.test.video.modelRelays.tester"
+            }
+        }
+    });
+
+    fluid.defaults("aconite.test.video.modelRelays.tester", {
+        gradeNames: "fluid.test.testCaseHolder",
+
+        invokers: {
+            testOutTime: {
+                funcName: "aconite.test.video.modelRelays.testOutTime",
+                args: "{noOutTimeVideo}"
+            }
+        },
+
+        modules: [
+            {
+                name: "Derived model attributes",
+                tests: [
+                    {
+                        name: "In and out timecode should be correctly parsed.",
+                        expect: 2,
+                        sequence: [
+                            {
+                                funcName: "jqUnit.assertEquals",
+                                args: [
+                                    "The inTime attribute should be parsed correctly in seconds.",
+                                    0.1,
+                                    "{allTimeCodeVideo}.model.inTimeSecs"
+                                ]
+                            },
+                            {
+                                funcName: "jqUnit.assertEquals",
+                                args: [
+                                    "The outTime attribute should be parsed correctly in seconds.",
+                                    0.2,
+                                    "{allTimeCodeVideo}.model.outTimeSecs"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "The video's totalDuration should be used to determine the clip's outTimeSecs.",
+                        expect: 2,
+                        sequence: [
+                            {
+                                event: "{noOutTimeVideo}.events.onDurationChange",
+                                listener: "{that}.testOutTime"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    aconite.test.video.modelRelays.testOutTime = function (video) {
+        jqUnit.assertNotUndefined("The outTimeSecs model property should not be undefined", video.model.outTimeSecs);
+        jqUnit.assertEquals("outTimeSecs should correspond to the totalDuration, less the inTimeSecs", video.model.totalDuration - 0.1, video.model.outTimeSecs);
+    };
+
     fluid.test.runTests("aconite.test.video.testEnvironment");
+    fluid.test.runTests("aconite.test.video.modelRelays.testEnvironment");
+
 })();

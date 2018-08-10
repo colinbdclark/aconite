@@ -16,10 +16,56 @@
             inTime: 0,
             outTime: undefined,
             duration: undefined,
+            frameRate: undefined,
             url: undefined,
             rate: 1.0,
-            muted: true
+            muted: true,
+
+            // Derived from parsing in/out/duration times.
+            inTimeSecs: undefined,
+            durationSecs: undefined,
+            outTimeSecs: undefined,
+
+            // Derived from the video element.
+            totalDuration: undefined
         },
+
+        modelRelay: [
+            {
+                target: "inTimeSecs",
+                singleTransform: {
+                    type: "fluid.transforms.free",
+                    func: "aconite.time.inTime",
+                    args: [
+                        "{that}.model.inTime",
+                        "{that}.model.frameRate"
+                    ]
+                }
+            },
+
+            {
+                target: "durationSecs",
+                singleTransform: {
+                    type: "fluid.transforms.free",
+                    func: "aconite.time.parseTimecode",
+                    args: [
+                        "{that}.model.duration",
+                        "{that}.model.frameRate"
+                    ]
+                }
+            },
+
+            {
+                target: "outTimeSecs",
+                singleTransform: {
+                    type: "fluid.transforms.free",
+                    func: "aconite.video.calculateOutTime",
+                    args: [
+                        "{that}.model"
+                    ]
+                }
+            }
+        ],
 
         members: {
             element: {
@@ -43,7 +89,10 @@
                 args: ["{that}", "muted", "{change}.value"]
             },
 
-            inTime: {
+            // TODO: On Safari, it  appears that this needs to be
+            // deferred until the video's "canplay" event fires,
+            // otherwise it has no effect.
+            inTimeSecs: {
                 funcName: "aconite.video.setAttribute",
                 args: ["{that}", "currentTime", "{change}.value"]
             },
@@ -63,21 +112,36 @@
                 // we always need to update the currentTime.
                 {
                     funcName: "aconite.video.setAttribute",
-                    args: ["{that}", "currentTime", "{that}.model.inTime"]
+                    args: ["{that}", "currentTime", "{that}.model.inTimeSecs"]
                 }
             ]
         },
 
         events: {
+            onVideoElementRendered: null,
             onVideoLoaded: null,
+            onDurationChange: null,
             onReady: null,
             onVideoEnded: null
         },
 
         listeners: {
-            "onCreate.bindVideoListeners": {
+            "onVideoElementRendered.bindVideoListeners": {
                 funcName: "aconite.video.bindVideoListeners",
-                args: ["{that}.events", "{that}.element"]
+                args: ["{that}.events", "{arguments}.0"]
+            },
+
+            "onDurationChange.updateTotalDuration": {
+                changePath: "totalDuration",
+                value: "{that}.element.duration"
+            },
+
+            // A hack to work around the fact that Safari
+            // won't allow modification of currentTime until the
+            // video is ready to play.
+            "onReady.resetCurrentTime": {
+                funcName: "aconite.video.setAttribute",
+                args: ["{that}", "currentTime", "{that}.model.inTimeSecs"]
             }
         },
 
@@ -86,8 +150,23 @@
         }
     });
 
+    aconite.video.calculateOutTime = function (m) {
+        var parsedOutTime = aconite.time.parseTimecode(m.outTime, m.frameRate);
+
+        if ((!parsedOutTime || isNaN(parsedOutTime)) && (m.durationSecs || m.totalDuration)) {
+            var duration = m.durationSecs || m.totalDuration;
+            return duration - m.inTimeSecs;
+        }
+
+        return parsedOutTime;
+    };
+
     aconite.video.bindVideoListeners = function (events, video) {
         var jVideo = jQuery(video);
+
+        jVideo.bind("durationchange", function () {
+            events.onDurationChange.fire();
+        });
 
         jVideo.one("canplay", function () {
             events.onReady.fire();
@@ -104,6 +183,8 @@
 
     aconite.video.renderVideoElement = function (that) {
         var video = jQuery(that.options.markup.video);
+        that.events.onVideoElementRendered.fire(video);
+
         return video[0];
     };
 
@@ -117,7 +198,7 @@
 
     aconite.video.setAttribute = function (that, propName, value) {
         // TODO: This may be problematic in future cases where
-        // one might legitimately want to clear out an attribute,
+        // one might want to remove an attribute,
         // but it is here in order to deal with the fact that it's
         // possible to legitimately have a video for which we don't want
         // to set an attribute at all.

@@ -427,7 +427,7 @@ var fluid = fluid || require("infusion"),
             testSpecs: aconite.tests.time.inTimeTestSpecs,
             tester: "aconite.tests.time.valueExceptionTester",
             testBody: function (testSpec) {
-                var actual = aconite.time.inTime(testSpec.timeSpec, testSpec.timeSpec.inTime);
+                var actual = aconite.time.inTime(testSpec.timeSpec.inTime, testSpec.timeSpec.frameRate);
                 QUnit.equal(actual, testSpec.expected, testSpec.message);
             }
         },

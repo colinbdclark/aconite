@@ -54,7 +54,7 @@ module.exports = function (grunt) {
             "src/clip-sequencers.js",
             "src/fcpxml-parser.js",
             "src/pip.js",
-            "src/ui/playButton.js"
+            "src/ui/js/playButton.js"
         ]
     };
 
@@ -115,16 +115,6 @@ module.exports = function (grunt) {
             }
         },
 
-        watch: {
-            scripts: {
-                files: ["src/**/*.js", "node_modules/**/*.js", "Gruntfile.js"],
-                tasks: ["default"],
-                options: {
-                    spawn: false
-                }
-            }
-        },
-
         aconite: {
             banners: {
                 short: "/*! Aconite <%= pkg.version %>, Copyright <%= grunt.template.today('yyyy') %> Colin Clark | github.com/colinbdclark/aconite */\n\n"
@@ -137,7 +127,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("fluid-grunt-eslint");
-    grunt.loadNpmTasks("grunt-contrib-watch");
 
     grunt.registerTask("default", ["clean", "eslint", "concat", "uglify"]);
 };
