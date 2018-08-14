@@ -42,6 +42,62 @@ var fluid = fluid || require("infusion"),
             {
                 name: "Modelized video attributes",
                 tests: [
+                    // This test is commented out because it
+                    // seems to be impossible to reliably
+                    // run it at the moment when "totalDuration"
+                    // has been properly updated.
+                    // This is due to the fact that Chrome fires its
+                    // various video element readiness events
+                    // asynchronously, while Safari and Firefox
+                    // do not.
+                    // In the latter cases, this means that onReady
+                    // will have fired synchronously as the result of
+                    // onCreate, and thus it's too late to listen for
+                    // this event by the time the framework has
+                    // instantiated the video component.
+                    // {
+                    //     name: "totalDuration is set correctly to the video's duration.",
+                    //     expect: 2,
+                    //     sequence: [
+                    //         {
+                    //             event: "{testEnvironment aconite.video}.events.onReady",
+                    //             listener: "aconite.test.video.tester.testDuration",
+                    //             args: ["{video}"]
+                    //         }
+                    //     ]
+                    // },
+                    {
+                        name: "currentTime attribute is set correctly to the default.",
+                        expect: 1,
+                        sequence: [
+                            {
+                                funcName: "jqUnit.assertEquals",
+                                args: [
+                                    "The currentTime attribute should be 0.1.",
+                                    0.1,
+                                    "{video}.element.currentTime"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "currentTime attribute is updated accordingly.",
+                        expect: 1,
+                        sequence: [
+                            {
+                                func: "{video}.applier.change",
+                                args: ["inTime", 0.5]
+                            },
+                            {
+                                funcName: "jqUnit.assertEquals",
+                                args: [
+                                    "The currentTime attribute should be 0.5.",
+                                    0.5,
+                                    "{video}.element.currentTime"
+                                ]
+                            }
+                        ]
+                    },
                     {
                         name: "Muted attribute is set correctly to the default.",
                         expect: 1,
@@ -104,6 +160,13 @@ var fluid = fluid || require("infusion"),
                             }
                         ]
                     },
+
+                    // Note that changes to the "src" attribute
+                    // will cause other properties to be updated,
+                    // possibly asynchronously after "onReady" is
+                    // fired. This is why
+                    // (due to poor test factoring)
+                    // these tests are at the end of the sequence.
                     {
                         name: "src attribute is set correctly to the default.",
                         expect: 1,
@@ -133,48 +196,6 @@ var fluid = fluid || require("infusion"),
                                     "../videos/lichen-01-720p.mp4",
                                     "{video}.element.src"
                                 ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "currentTime attribute is set correctly to the default.",
-                        expect: 1,
-                        sequence: [
-                            {
-                                funcName: "jqUnit.assertEquals",
-                                args: [
-                                    "The currentTime attribute should be 0.1.",
-                                    0.1,
-                                    "{video}.element.currentTime"
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "currentTime attribute is updated accordingly.",
-                        expect: 1,
-                        sequence: [
-                            {
-                                func: "{video}.applier.change",
-                                args: ["inTime", 0.5]
-                            },
-                            {
-                                funcName: "jqUnit.assertEquals",
-                                args: [
-                                    "The currentTime attribute should be 0.5.",
-                                    0.5,
-                                    "{video}.element.currentTime"
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "totalDuration is set correctly to the video's duration.",
-                        expect: 2,
-                        sequence: [
-                            {
-                                funcName: "aconite.test.video.tester.testDuration",
-                                args: ["{video}"]
                             }
                         ]
                     }
@@ -274,7 +295,15 @@ var fluid = fluid || require("infusion"),
                         expect: 2,
                         sequence: [
                             {
-                                event: "{noOutTimeVideo}.events.onDurationChange",
+                                // Note: it would be reasonable
+                                // to listen for "onDurationChange",
+                                // which is fired by Chrome and Safari
+                                // when preparing a video to be played.
+                                // However, Firefox does not fire this
+                                // event at initialization time.
+                                // Hence, we listen for
+                                // "onReady" instead.
+                                event: "{noOutTimeVideo}.events.onReady",
                                 listener: "{that}.testOutTime"
                             }
                         ]

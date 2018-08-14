@@ -140,6 +140,7 @@
             // won't allow modification of currentTime until the
             // video is ready to play.
             "onReady.resetCurrentTime": {
+                priority: "first",
                 funcName: "aconite.video.setAttribute",
                 args: ["{that}", "currentTime", "{that}.model.inTimeSecs"]
             }
