@@ -18,6 +18,7 @@ var fluid = fluid || require("infusion"),
 
         components: {
             video: {
+                createOnEvent: "onCreateVideo",
                 type: "aconite.video",
                 options: {
                     model: {
@@ -32,6 +33,10 @@ var fluid = fluid || require("infusion"),
             tester: {
                 type: "aconite.test.video.tester"
             }
+        },
+
+        events: {
+            onCreateVideo: null
         }
     });
 
@@ -42,41 +47,17 @@ var fluid = fluid || require("infusion"),
             {
                 name: "Modelized video attributes",
                 tests: [
-                    // This test is commented out because it
-                    // seems to be impossible to reliably
-                    // run it at the moment when "totalDuration"
-                    // has been properly updated.
-                    // This is due to the fact that Chrome fires its
-                    // various video element readiness events
-                    // asynchronously, while Safari and Firefox
-                    // do not.
-                    // In the latter cases, this means that onReady
-                    // will have fired synchronously as the result of
-                    // onCreate, and thus it's too late to listen for
-                    // this event by the time the framework has
-                    // instantiated the video component.
-                    // {
-                    //     name: "totalDuration is set correctly to the video's duration.",
-                    //     expect: 2,
-                    //     sequence: [
-                    //         {
-                    //             event: "{testEnvironment aconite.video}.events.onReady",
-                    //             listener: "aconite.test.video.tester.testDuration",
-                    //             args: ["{video}"]
-                    //         }
-                    //     ]
-                    // },
                     {
                         name: "currentTime attribute is set correctly to the default.",
                         expect: 1,
                         sequence: [
                             {
-                                funcName: "jqUnit.assertEquals",
-                                args: [
-                                    "The currentTime attribute should be 0.1.",
-                                    0.1,
-                                    "{video}.element.currentTime"
-                                ]
+                                funcName: "{testEnvironment}.events.onCreateVideo.fire"
+                            },
+                            {
+                                event: "{testEnvironment aconite.video}.events.onReady",
+                                listener: "aconite.test.video.tester.testCurrentTimeDefault",
+                                args: ["{video}"]
                             }
                         ]
                     },
@@ -95,6 +76,16 @@ var fluid = fluid || require("infusion"),
                                     0.5,
                                     "{video}.element.currentTime"
                                 ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "totalDuration is set correctly to the video's duration.",
+                        expect: 2,
+                        sequence: [
+                            {
+                                funcName: "aconite.test.video.tester.testDuration",
+                                args: ["{video}"]
                             }
                         ]
                     },
@@ -203,6 +194,11 @@ var fluid = fluid || require("infusion"),
             }
         ]
     });
+
+    aconite.test.video.tester.testCurrentTimeDefault = function (video) {
+        jqUnit.assertEquals("The currentTime attribute should be 0.1.",
+            0.1, video.element.currentTime);
+    };
 
     aconite.test.video.tester.testDuration = function (video) {
         jqUnit.assertNotUndefined("The totalDuration should not be undefined", video.model.totalDuration);

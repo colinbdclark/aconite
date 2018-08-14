@@ -126,9 +126,18 @@
         },
 
         listeners: {
-            "onVideoElementRendered.bindVideoListeners": {
+            // In case we've got a video that we didn't render,
+            // and which is already ready by the time we've
+            // been created.
+            "onCreate.checkAndFireReadyState": {
+                priority: "before:bindVideoListeners",
+                funcName: "aconite.video.checkAndFireReadyState",
+                args: ["{that}"]
+            },
+
+            "onCreate.bindVideoListeners": {
                 funcName: "aconite.video.bindVideoListeners",
-                args: ["{that}.events", "{arguments}.0"]
+                args: ["{that}.events", "{that}.element"]
             },
 
             "onDurationChange.updateTotalDuration": {
@@ -151,6 +160,13 @@
         }
     });
 
+    aconite.video.checkAndFireReadyState = function (that) {
+        if (that.isReady()) {
+            // Avoid Zalgo until Infusion is immune.
+            fluid.invokeLater(that.events.onReady.fire);
+        }
+    };
+
     aconite.video.calculateOutTime = function (m) {
         var parsedOutTime = aconite.time.parseTimecode(m.outTime, m.frameRate);
 
@@ -169,11 +185,11 @@
             events.onDurationChange.fire();
         });
 
-        jVideo.one("canplay", function () {
+        jVideo.one("canplaythrough", function () {
             events.onReady.fire();
         });
 
-        jVideo.bind("canplay", function () {
+        jVideo.bind("canplaythrough", function () {
             events.onVideoLoaded.fire(video);
         });
 
