@@ -220,11 +220,10 @@ var fluid = fluid || require("infusion"),
                             {
                                 func: "{video}.applier.change",
                                 args: ["", {
-                                        frameRate: 24,
-                                        inTime: 0.5,
-                                        duration: "00:00:10:12"
-                                    }
-                                ]
+                                    frameRate: 24,
+                                    inTime: 0.5,
+                                    duration: "00:00:10:12"
+                                }]
                             },
                             {
                                 funcName: "jqUnit.assertEquals",
