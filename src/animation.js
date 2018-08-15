@@ -52,7 +52,7 @@
         },
 
         // TODO: Remove this in favour of automatically populating
-        // a defalt model with names/values from the glRender's
+        // a default model with names/values from the glRender's
         // uniforms option.
         // They can then be remapped as needed by the user via
         // model relays/transforms.

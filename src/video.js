@@ -35,7 +35,7 @@
                 target: "inTimeSecs",
                 singleTransform: {
                     type: "fluid.transforms.free",
-                    func: "aconite.time.inTime",
+                    func: "aconite.video.inTime",
                     args: [
                         "{that}.model.inTime",
                         "{that}.model.frameRate"
@@ -59,7 +59,7 @@
                 target: "outTimeSecs",
                 singleTransform: {
                     type: "fluid.transforms.free",
-                    func: "aconite.video.calculateOutTime",
+                    func: "aconite.video.outTime",
                     args: [
                         "{that}.model"
                     ]
@@ -167,12 +167,22 @@
         }
     };
 
-    aconite.video.calculateOutTime = function (m) {
+    aconite.video.inTime = function (inTime, frameRate) {
+        var inTime = aconite.time.parseTimecode(inTime, frameRate);
+        return isNaN(inTime) ? 0 : inTime;
+    };
+
+    aconite.video.outTime = function (m) {
         var parsedOutTime = aconite.time.parseTimecode(m.outTime, m.frameRate);
 
-        if ((!parsedOutTime || isNaN(parsedOutTime)) && (m.durationSecs || m.totalDuration)) {
-            var duration = m.durationSecs || m.totalDuration;
-            return duration - m.inTimeSecs;
+        if (!parsedOutTime || isNaN(parsedOutTime)) {
+            if (m.durationSecs) {
+                // TODO: What if this value is larger than
+                // the video's totalDuration (due to user error)?
+                return m.durationSecs + m.inTimeSecs;
+            } else if (m.totalDuration) {
+                return m.totalDuration - m.inTimeSecs;
+            }
         }
 
         return parsedOutTime;

@@ -189,6 +189,52 @@ var fluid = fluid || require("infusion"),
                                 ]
                             }
                         ]
+                    },
+                    {
+                        name: "duration timecode is parsed and relayed, default 30 fps frame rate",
+                        expect: 1,
+                        sequence: [
+                            {
+                                func: "{video}.applier.change",
+                                args: ["", {
+                                    frameRate: null,
+                                    outTime: null,
+                                    inTime: 10,
+                                    duration: "00:01:11:15"
+                                }]
+                            },
+                            {
+                                funcName: "jqUnit.assertEquals",
+                                args: [
+                                    "The outTimeSecs attribute should be 81.5",
+                                    81.5,
+                                    "{video}.model.outTimeSecs"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "duration timecode is parsed and relayed, 24 fps frame rate",
+                        expect: 1,
+                        sequence: [
+                            {
+                                func: "{video}.applier.change",
+                                args: ["", {
+                                        frameRate: 24,
+                                        inTime: 0.5,
+                                        duration: "00:00:10:12"
+                                    }
+                                ]
+                            },
+                            {
+                                funcName: "jqUnit.assertEquals",
+                                args: [
+                                    "The outTimeSecs attribute should be 11",
+                                    11,
+                                    "{video}.model.outTimeSecs"
+                                ]
+                            }
+                        ]
                     }
                 ]
             }
