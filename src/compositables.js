@@ -11,7 +11,7 @@
 
     fluid.registerNamespace("aconite");
 
-    // TODO Add a onDestroy listener that calls
+    // TODO Add an onDestroy listener that calls
     // gl.deleteTexture()
     fluid.defaults("aconite.texture", {
         gradeNames: "fluid.component",

@@ -41,8 +41,6 @@
         var type = typeof timecode;
         if (type === "number") {
             return timecode;
-        } else if (type === "undefined") {
-            return undefined;
         } else if (type !== "string") {
             return NaN;
         }
