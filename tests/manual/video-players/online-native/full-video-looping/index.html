@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Native Online Video Player Test - Full Video Looping</title>
+
+        <link rel="stylesheet" href="../../../../../src/ui/css/stage.css" type="text/css" />
+
+        <script src="../../../../../dist/aconite-all.js"></script>
+
+        <script src="../../shared/js/base-video-player-test.js"></script>
+        <script src="js/native-video-player-full-looping-test.js"></script>
+
+    </head>
+    <body>
+        <img class="aconite-animator-play" src="../../../../../src/ui/images/play_overlay.png"></img>
+
+        <div class="aconite-video-container">
+            <video src="../../../../videos/1.m4v" />
+        </div>
+
+        <script>
+            window.videoPlayerTest = aconite.test.nativeOnlineVideoPlayerFullLoopingTest(".aconite-video-container");
+        </script>
+    </body>
+</html>

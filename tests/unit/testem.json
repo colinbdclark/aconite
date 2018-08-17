@@ -1,4 +1,13 @@
 {
     "test_page": "tests/unit/all-tests.html",
-    "timeout": 300
+    "timeout": 300,
+    "skip": "IE",
+    "browser_args": {
+        "Chrome": [
+            "--autoplay-policy=no-user-gesture-required"
+        ],
+        "Chrome Canary": [
+            "--autoplay-policy=no-user-gesture-required"
+        ]
+    }
 }

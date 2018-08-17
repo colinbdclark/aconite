@@ -2,7 +2,7 @@
  * Aconite Video
  * http://github.com/colinbdclark/aconite
  *
- * Copyright 2013-2015, Colin Clark
+ * Copyright 2013-2018, Colin Clark
  * Distributed under the MIT license.
  */
 
@@ -13,13 +13,59 @@
         gradeNames: "fluid.modelComponent",
 
         model: {
-            inTime: null,
-            outTime: null,
-            duration: null,
-            url: null,
-            composedURL: null,
-            rate: 1.0
+            inTime: 0,
+            outTime: undefined,
+            duration: undefined,
+            frameRate: undefined,
+            url: undefined,
+            rate: 1.0,
+            muted: true,
+
+            // Derived from parsing in/out/duration times.
+            inTimeSecs: undefined,
+            durationSecs: undefined,
+            outTimeSecs: undefined,
+
+            // Derived from the video element.
+            totalDuration: undefined
         },
+
+        modelRelay: [
+            {
+                target: "inTimeSecs",
+                singleTransform: {
+                    type: "fluid.transforms.free",
+                    func: "aconite.video.inTime",
+                    args: [
+                        "{that}.model.inTime",
+                        "{that}.model.frameRate"
+                    ]
+                }
+            },
+
+            {
+                target: "durationSecs",
+                singleTransform: {
+                    type: "fluid.transforms.free",
+                    func: "aconite.time.parseTimecode",
+                    args: [
+                        "{that}.model.duration",
+                        "{that}.model.frameRate"
+                    ]
+                }
+            },
+
+            {
+                target: "outTimeSecs",
+                singleTransform: {
+                    type: "fluid.transforms.free",
+                    func: "aconite.video.outTime",
+                    args: [
+                        "{that}.model"
+                    ]
+                }
+            }
+        ],
 
         members: {
             element: {
@@ -37,77 +83,123 @@
             }
         },
 
-        modelRelay: {
-            target: "composedURL",
-            singleTransform: {
-                type: "fluid.transforms.free",
-                func: "aconite.video.composeURL",
-                args: [
-                    "{that}.model.url",
-                    "{that}.model.inTime",
-                    "{that}.model.outTime",
-                    "{that}.model.duration"
-                ]
-            }
-        },
-
         modelListeners: {
-            composedURL: {
-                funcName: "aconite.video.setVideoURL",
-                args: ["{that}.element", "{change}.value"]
+            muted: {
+                funcName: "aconite.video.setAttribute",
+                args: ["{that}", "muted", "{change}.value"]
             },
 
-            rate: "aconite.video.updatePlaybackRate({that})"
+            // TODO: On Safari, it  appears that this needs to be
+            // deferred until the video's "canplay" event fires,
+            // otherwise it has no effect.
+            inTimeSecs: {
+                funcName: "aconite.video.setAttribute",
+                args: ["{that}", "currentTime", "{change}.value"]
+            },
+
+            rate: {
+                funcName: "aconite.video.setAttribute",
+                args: ["{that}", "playbackRate", "{change}.value"]
+            },
+
+            url: [
+                {
+                    funcName: "aconite.video.setAttribute",
+                    args: ["{that}", "src", "{change}.value"]
+                },
+
+                // Whenever the video's src changes,
+                // we always need to update the currentTime.
+                {
+                    funcName: "aconite.video.setAttribute",
+                    args: ["{that}", "currentTime", "{that}.model.inTimeSecs"]
+                }
+            ]
         },
 
         events: {
+            onVideoElementRendered: null,
             onVideoLoaded: null,
+            onDurationChange: null,
             onReady: null,
             onVideoEnded: null
         },
 
         listeners: {
+            // In case we've got a video that we didn't render,
+            // and which is already ready by the time we've
+            // been created.
+            "onCreate.checkAndFireReadyState": {
+                priority: "before:bindVideoListeners",
+                funcName: "aconite.video.checkAndFireReadyState",
+                args: ["{that}"]
+            },
+
             "onCreate.bindVideoListeners": {
                 funcName: "aconite.video.bindVideoListeners",
                 args: ["{that}.events", "{that}.element"]
+            },
+
+            "onDurationChange.updateTotalDuration": {
+                changePath: "totalDuration",
+                value: "{that}.element.duration"
+            },
+
+            // A hack to work around the fact that Safari
+            // won't allow modification of currentTime until the
+            // video is ready to play.
+            "onReady.resetCurrentTime": {
+                priority: "first",
+                funcName: "aconite.video.setAttribute",
+                args: ["{that}", "currentTime", "{that}.model.inTimeSecs"]
             }
         },
 
         markup: {
-            video: "<video muted='true'/>"
+            video: "<video />"
         }
     });
 
-    aconite.video.composeURL = function (url, inTime, outTime, duration) {
-        if (url === null || url === undefined) {
-            return;
+    aconite.video.checkAndFireReadyState = function (that) {
+        if (that.isReady()) {
+            // Avoid Zalgo until Infusion is immune.
+            fluid.invokeLater(that.events.onReady.fire);
         }
-
-        var timeSpec = {
-            inTime: inTime,
-            outTime: outTime,
-            duration: duration
-        };
-
-        return url + aconite.time.timeFragment(timeSpec);
     };
 
-    aconite.video.setVideoURL = function (element, composedURL) {
-        if (composedURL == null || composedURL === undefined) {
-            return;
+    aconite.video.inTime = function (inTime, frameRate) {
+        var inTime = aconite.time.parseTimecode(inTime, frameRate);
+        return isNaN(inTime) ? 0 : inTime;
+    };
+
+    aconite.video.outTime = function (m) {
+        var parsedOutTime = aconite.time.parseTimecode(m.outTime, m.frameRate);
+
+        if (!parsedOutTime || isNaN(parsedOutTime)) {
+            if (m.durationSecs) {
+                // TODO: What if this value is larger than
+                // the video's totalDuration (due to user error)?
+                return m.durationSecs + m.inTimeSecs;
+            } else if (m.totalDuration) {
+                return m.totalDuration - m.inTimeSecs;
+            }
         }
 
-        element.src = composedURL;
+        return parsedOutTime;
     };
 
     aconite.video.bindVideoListeners = function (events, video) {
         var jVideo = jQuery(video);
 
-        jVideo.one("canplay", function () {
+        jVideo.bind("durationchange", function () {
+            events.onDurationChange.fire();
+        });
+
+        jVideo.one("canplaythrough", function () {
             events.onReady.fire();
         });
 
-        jVideo.bind("canplay", function () {
+        jVideo.bind("canplaythrough", function () {
             events.onVideoLoaded.fire(video);
         });
 
@@ -118,18 +210,30 @@
 
     aconite.video.renderVideoElement = function (that) {
         var video = jQuery(that.options.markup.video);
-        return video[0];
-    };
+        that.events.onVideoElementRendered.fire(video);
 
-    aconite.video.updatePlaybackRate = function (that) {
-        that.element.playbackRate = that.model.rate;
+        return video[0];
     };
 
     aconite.video.isReady = function (that, videoEl) {
         return videoEl && videoEl.readyState === 4;
     };
 
-    aconite.video.assignClip = function (vid, clip) {
-        vid.applier.change("", clip);
+    aconite.video.assignClip = function (that, clip) {
+        that.applier.change("", clip);
+    };
+
+    aconite.video.setAttribute = function (that, propName, value) {
+        // TODO: This may be problematic in future cases where
+        // one might want to remove an attribute,
+        // but it is here in order to deal with the fact that it's
+        // possible to legitimately have a video for which we don't want
+        // to set an attribute at all.
+        // (e.g. because a pre-existing video element is specified).
+        if (value === null || value === undefined) {
+            return;
+        }
+
+        that.element[propName] = value;
     };
 })();

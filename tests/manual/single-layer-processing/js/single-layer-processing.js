@@ -54,7 +54,7 @@
                 }
             },
 
-            sourcePlayer: {
+            player: {
                 container: "{videoLayer}.dom.video"
             }
         },

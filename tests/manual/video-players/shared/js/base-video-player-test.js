@@ -2,11 +2,13 @@
     "use strict";
 
     fluid.defaults("aconite.test.videoPlayerTest", {
-        gradeNames: "fluid.viewComponent",
+        gradeNames: [
+            "aconite.videoPerformer",
+            "fluid.viewComponent"
+        ],
 
         components: {
-            video: {
-                type: "aconite.video",
+            source: {
                 options: {
                     members: {
                         element: "{videoPlayerTest}.dom.video.0"
@@ -14,20 +16,15 @@
                 }
             },
 
-            player: {
-                type: "aconite.videoPlayer",
+            playButton: {
+                type: "aconite.ui.playButtonOverlay",
+                container: ".aconite-animator-play",
                 options: {
-                    components: {
-                        video: "{video}"
+                    listeners: {
+                        onPlay: "{videoPlayerTest}.play()"
                     }
                 }
             }
-        },
-
-        listeners: {
-            onCreate: [
-                "{player}.play()"
-            ]
         },
 
         selectors: {

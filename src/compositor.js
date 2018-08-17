@@ -72,7 +72,7 @@
         components: {
             playButton: {
                 createOnEvent: "onLayersReady",
-                type: "aconite.ui.playButtonOverlay",
+                type: "aconite.ui.playButtonOverlay.fullScreen",
                 container: "{withPlayButton}.dom.playButton",
                 options: {
                     events: {

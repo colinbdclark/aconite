@@ -16,22 +16,22 @@
     ],
     "readmeFilename": "README.md",
     "devDependencies": {
-        "jquery": "3.2.1",
+        "jquery": "3.3.1",
         "grunt": "1.0.1",
-        "grunt-contrib-uglify": "3.1.0",
+        "grunt-contrib-uglify": "3.4.0",
         "grunt-contrib-clean": "1.1.0",
         "grunt-contrib-copy": "1.0.0",
         "grunt-contrib-concat": "1.0.1",
         "fluid-grunt-eslint": "18.1.2",
-        "grunt-contrib-watch": "1.0.0"
+        "testem": "2.9.2"
     },
     "dependencies": {
-        "infusion": "3.0.0-dev.20171102T191539Z.c0636b395",
-        "bergson": "0.13.1",
-        "flocking": "0.2.0-dev.20170206T221943Z.fb09a52"
+        "infusion": "3.0.0-dev.20180720T113347Z.272cf70",
+        "bergson": "0.13.2",
+        "flocking": "0.2.0-dev.20171204T033913Z.1a5ae7d"
     },
     "scripts": {
-        "prepare": "grunt",
-        "test": "testem ci --file tests/unit/testem.json"
+        "prepare": "node_modules/.bin/grunt",
+        "test": "node_modules/.bin/testem ci --file tests/unit/testem.json"
     }
 }

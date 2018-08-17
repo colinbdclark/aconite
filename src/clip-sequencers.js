@@ -110,26 +110,19 @@
         }
     });
 
-    aconite.clipSequencer.swapClips = function (sourcePlayer, preroller, clip) {
-        var displayEl = sourcePlayer.video.element,
+    aconite.clipSequencer.swapClips = function (player, preroller) {
+        var displayEl = player.video.element,
             preRollEl = preroller.element;
 
-        // Manually update the currentTime of the video
-        // because time fragments suck.
-        // https://github.com/colinbdclark/aconite/issues/9
-        // TODO: This can be removed when we ditch time fragments.
-        var parsed = aconite.time.parseTimecode(clip.inTime);
-        preRollEl.currentTime = isNaN(parsed) ? 0 : parsed;
-
-        sourcePlayer.video.element = preRollEl;
+        player.video.element = preRollEl;
         preroller.element = displayEl;
     };
 
     aconite.clipSequencer.displayClip = function (that, clip) {
         that.events.onNextClip.fire(clip);
-        aconite.clipSequencer.swapClips(that.layer.sourcePlayer,
+        aconite.clipSequencer.swapClips(that.layer.player,
             that.preroller, clip);
-        that.layer.sourcePlayer.play();
+        that.layer.player.play();
     };
 
     aconite.clipSequencer.displayNextClip = function (that, nextClip) {

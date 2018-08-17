@@ -135,6 +135,7 @@ var fluid = fluid || require("infusion"),
         }
     ];
 
+    // TODO: Move to video-tests.js
     aconite.tests.time.inTimeTestSpecs = [
         {
             timeSpec: {
@@ -174,6 +175,7 @@ var fluid = fluid || require("infusion"),
         }
     ];
 
+    // TODO: Move to video-tests.js
     aconite.tests.time.outTimeTestSpecs = [
         {
             timeSpec: {
@@ -199,23 +201,6 @@ var fluid = fluid || require("infusion"),
             },
             expected: 71.5,
             message: "Frame-accurate outTime time code, default 30 fps frame rate."
-        },
-        {
-            timeSpec: {
-                inTime: 10,
-                duration: "00:01:11:15"
-            },
-            expected: 81.5,
-            message: "Frame-accurate duration time code, default 30 fps frame rate."
-        },
-        {
-            timeSpec: {
-                inTime: 0.5,
-                duration: "00:00:10:12",
-                frameRate: 24
-            },
-            expected: 11,
-            message: "Frame-accurate duration time code, 24 fps frame rate."
         },
         {
             timeSpec: {
@@ -344,63 +329,6 @@ var fluid = fluid || require("infusion"),
         }
     ];
 
-    aconite.tests.time.timeFragmentTestSpecs = [
-        {
-            timeSpec: {
-                outTime: "00:00:01:00"
-            },
-            expected: "",
-            message: "Time spec with no inTime or duration returns and empty fragment"
-        },
-        {
-            timeSpec: {
-                inTime: "00:01:00:00",
-                outTime: NaN
-            },
-            expected: "#t=60",
-            message: "Time spec with invalid (NaN) out time returns a fragment with only an inTime"
-        },
-        {
-            timeSpec: {
-                inTime: "00:00:01:00",
-                outTime: "00:00:02:15"
-            },
-            expected: "#t=1,2.5",
-            message: "Time spec with frame-accurate in and out times"
-        },
-        {
-            timeSpec: {
-                duration: 10
-            },
-            expected: "#t=0,10",
-            message: "Time spec with only a duration specified as a Number"
-        },
-        {
-            timeSpec: {
-                duration: "00:01:00:00"
-            },
-            expected: "#t=0,60",
-            message: "Time spec with only a duration specified as a timecode"
-        },
-        {
-            timeSpec: {
-                inTime: 10,
-                outTime: 20
-            },
-            expected: "#t=10,20",
-            message: "Time spec with in and out times specified as Numbers"
-        },
-        {
-            timeSpec: {
-                inTime: "00:01:00:15",
-                outTime: "00:02:00:12",
-                frameRate: 24
-            },
-            expected: "#t=60.625,120.5",
-            message: "Time spec with both in and out times specified as frame-accurate timecodes, at 24 fps"
-        }
-    ];
-
     aconite.tests.time.testSuite = [
         {
             name: "aconite.time.isValidTimeSegment",
@@ -422,21 +350,23 @@ var fluid = fluid || require("infusion"),
                 QUnit.ok(testSpec.expected, testSpec.message);
             }
         },
+        // TODO: Move to video-tests.js
         {
-            name: "aconite.time.inTime",
+            name: "aconite.video.inTime",
             testSpecs: aconite.tests.time.inTimeTestSpecs,
             tester: "aconite.tests.time.valueExceptionTester",
             testBody: function (testSpec) {
-                var actual = aconite.time.inTime(testSpec.timeSpec, testSpec.timeSpec.inTime);
+                var actual = aconite.video.inTime(testSpec.timeSpec.inTime, testSpec.timeSpec.frameRate);
                 QUnit.equal(actual, testSpec.expected, testSpec.message);
             }
         },
+        // TODO: Move to video-tests.js
         {
-            name: "aconite.time.outTime",
+            name: "aconite.video.outTime",
             testSpecs: aconite.tests.time.outTimeTestSpecs,
             tester: "aconite.tests.time.valueExceptionTester",
             testBody: function (testSpec) {
-                var actual = aconite.time.outTime(testSpec.timeSpec, testSpec.timeSpec.inTime);
+                var actual = aconite.video.outTime(testSpec.timeSpec);
                 QUnit.equal(actual, testSpec.expected, testSpec.message);
             }
         },
@@ -451,15 +381,6 @@ var fluid = fluid || require("infusion"),
                 } else {
                     QUnit.equal(actual, testSpec.expected, testSpec.message);
                 }
-            }
-        },
-        {
-            name: "aconite.time.timeFragment",
-            testSpecs: aconite.tests.time.timeFragmentTestSpecs,
-            tester: "aconite.tests.time.valueExceptionTester",
-            testBody: function (testSpec) {
-                var actual = aconite.time.timeFragment(testSpec.timeSpec);
-                QUnit.equal(actual, testSpec.expected, testSpec.message);
             }
         }
     ];

@@ -2,7 +2,7 @@
  * Aconite Video Player
  * http://github.com/colinbdclark/aconite
  *
- * Copyright 2013-2015, Colin Clark
+ * Copyright 2013-2018, Colin Clark
  * Distributed under the MIT license.
  */
 
@@ -11,19 +11,73 @@
 (function () {
     "use strict";
 
+    fluid.defaults("aconite.videoTimelineNotifier", {
+        gradeNames: "fluid.component",
+
+        components: {
+            clock: {
+                type: "berg.clock.raf"
+            },
+
+            video: {
+                type: "aconite.video"
+            }
+        },
+
+        invokers: {
+            start: {
+                func: "{clock}.start"
+            },
+
+            stop: {
+                func: "{clock}.stop"
+            },
+
+            checkCurrentTime: {
+                funcName: "aconite.videoTimelineNotifier.checkCurrentTime",
+                args: ["{that}"]
+            }
+        },
+
+        events: {
+            onClipIn: null,
+            onTick: "{clock}.events.onTick",
+            onClipOut: null,
+        },
+
+        listeners: {
+            "onTick.checkCurrentTime": {
+                func: "{that}.checkCurrentTime"
+            }
+        }
+    });
+
+    aconite.videoTimelineNotifier.checkCurrentTime = function (that) {
+        var videoTime = that.video.element.currentTime,
+            m = that.video.model;
+
+        // TODO: We may want to test whether we're within
+        // the range of in/out time by less than a tick's duration.
+        if (videoTime <= m.inTimeSecs) {
+            that.events.onClipIn.fire(videoTime);
+        } else if ((m.outTimeSecs && videoTime >= m.outTimeSecs) ||
+            videoTime >= m.totalDuration) {
+            that.events.onClipOut.fire(videoTime);
+        }
+    };
+
     fluid.defaults("aconite.videoPlayer", {
         gradeNames: "fluid.modelComponent",
 
         model: {
             rate: 1.0,
             loop: false,
-            isPlaying: false,
-            inTime: null,
-            outTime: null
+            isPlaying: false
         },
 
         invokers: {
             play: "{that}.events.onPlay.fire()",
+
             pause: "{that}.events.onPause.fire()"
         },
 
@@ -67,9 +121,7 @@
     });
 
     aconite.videoPlayer.seekToTime = function (time, that) {
-        if (that.model.seekImmediately) {
-            that.video.element.currentTime = time;
-        }
+        that.video.element.currentTime = time;
     };
 
     aconite.videoPlayer.checkEndTime = function (that) {
@@ -86,34 +138,105 @@
     fluid.defaults("aconite.videoPlayer.nativeElement", {
         gradeNames: "aconite.videoPlayer",
 
+        components: {
+            timelineNotifier: {
+                type: "aconite.videoTimelineNotifier",
+                options: {
+                    components: {
+                        video: "{nativeElement}.video"
+                    },
+
+                    events: {
+                        onClipIn: "{nativeElement}.events.onClipIn",
+                        onClipOut: "{nativeElement}.events.onClipOut"
+                    }
+                }
+            }
+        },
+
+        events: {
+            onClipIn: null,
+            onClipOut: null
+        },
+
         listeners: {
             "onPlay.playVideoElement": {
                 this: "{that}.video.element",
                 method: "play"
             },
+
+            "onPlay.startNotifier": "{that}.timelineNotifier.start()",
+
+            "onClipIn.handleInPoint": {
+                funcName: "aconite.videoPlayer.nativeElement.inPoint",
+                args: ["{that}"]
+            },
+
+            "onClipOut.handleOutPoint": {
+                funcName: "aconite.videoPlayer.nativeElement.outPoint",
+                args: ["{that}"]
+            },
+
             "onPause.pauseVideoElement": {
                 this: "{that}.video.element",
                 method: "pause"
-            }
+            },
+
+            "onPause.stopNotifier": "{that}.timelineNotifier.stop()"
         },
 
         modelListeners: {
             loop: {
-                funcName: "aconite.videoPlayer.nativeElement.setVideoProperty",
+                funcName: "aconite.video.setAttribute",
                 args: ["{that}.video", "loop", "{change}.value"]
             },
 
             rate: {
-                funcName: "aconite.videoPlayer.nativeElement.setVideoProperty",
+                funcName: "aconite.video.setAttribute",
                 args: ["{that}.video", "playbackRate", "{change}.value"]
             }
         }
     });
 
-    aconite.videoPlayer.nativeElement.setVideoProperty = function (video, propName, value) {
-        video.element[propName] = value;
+    aconite.videoPlayer.nativeElement.canLoopNatively = function (that) {
+        var m = that.video.model,
+            vidDur = that.video.element.duration;
+
+        return (!m.inTime) &&
+            (!m.outTime || m.outTime === vidDur) &&
+            (!m.duration || m.duration === vidDur);
     };
 
+    aconite.videoPlayer.nativeElement.inPoint = function (that) {
+        var vidEl = that.video.element;
+
+        if (vidEl.playbackRate < 0) {
+            // We're playing backwards.
+            if (that.model.loop) {
+                if (!aconite.videoPlayer.nativeElement.canLoopNatively(that)) {
+                    // Loop back to the out point.
+                    vidEl.currentTime = that.video.model.outTime;
+                }
+            } else {
+                that.pause();
+            }
+        }
+    };
+
+    aconite.videoPlayer.nativeElement.outPoint = function (that) {
+        var vidEl = that.video.element;
+
+        if (vidEl.playbackRate > 0) {
+            if (that.model.loop) {
+                if (!aconite.videoPlayer.nativeElement.canLoopNatively(that)) {
+                    // Loop back to the out point.
+                    vidEl.currentTime = that.video.model.inTime;
+                }
+            } else {
+                that.pause();
+            }
+        }
+    };
 
     /**
      * An online VideoPlayer driven by an external clock.
@@ -148,7 +271,10 @@
                 args: ["{arguments}.0", "{that}"]
             },
 
-            "onVideoEnded.end": "aconite.videoPlayer.manual.end({that})"
+            "onVideoEnded.handleOutPoint": {
+                funcName: "aconite.videoPlayer.manual.handleOutPoint",
+                args: ["{that}"]
+            }
         }
     });
 
@@ -168,14 +294,14 @@
         aconite.videoPlayer.checkEndTime(that);
     };
 
-    aconite.videoPlayer.manual.end = function (that) {
+
+    aconite.videoPlayer.manual.handleOutPoint = function (that) {
         if (that.model.loop) {
-            that.video.element.currentTime = that.model.inTime;
+            aconite.videoPlayer.seekToTime(that.model.inTime, that);
         } else {
             that.pause();
         }
     };
-
 
     fluid.defaults("aconite.videoPlayer.manualOnline", {
         gradeNames: "aconite.videoPlayer.manual",
