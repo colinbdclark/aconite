@@ -49,6 +49,7 @@
         gl.bindTexture(gl.TEXTURE_2D, texture);
 
         fluid.each(that.options.parameters, function (value, key) {
+            // TODO: This will fail with float-typed paramters.
             gl.texParameteri(gl.TEXTURE_2D, gl[key], gl[value]);
         });
 
@@ -91,6 +92,7 @@
     });
 
     aconite.compositable.draw = function (gl, source, texture, textureUnit) {
+        // TODO: This should be model state.
         if (!source.isReady()) {
             return;
         }
