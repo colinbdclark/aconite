@@ -51,6 +51,12 @@
     });
 
     aconite.videoTimelineNotifier.checkCurrentTime = function (that) {
+        // TODO: Indications are that video.currentTime isn't
+        // updated with frame-level accuracy.
+        // https://youtu.be/GsvAdTyXN8o?t=748
+        // Instead, do we need to refer to a Bergson clock's timing,
+        // which has been synched to the actual play start time
+        // of the video?
         var videoTime = that.video.element.currentTime,
             m = that.video.model;
 

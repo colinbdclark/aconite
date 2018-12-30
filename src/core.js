@@ -167,7 +167,7 @@
     };
 
     // TODO: This API makes it very difficult to specify one dimensional vectors
-    // because it can't currently infer unidimensionality as it does for scalars types.
+    // because it can't currently infer unidimensionality as it does for scalar types.
     aconite.setUniforms = function (gl, shaderProgram, uniforms) {
         fluid.each(uniforms, function (valueSpec, key) {
             aconite.setUniform(gl, shaderProgram, key, valueSpec.type, valueSpec.values,
@@ -176,6 +176,8 @@
     };
 
     aconite.makeSquareVertexBuffer = function (gl, vertexPosition) {
+        // TODO: This code appears to have bugs in it.
+        // "info" is never used outside of this function.
         var info = {
             vertices: new Float32Array([
                 -1, 1,   1,  1,   1, -1,  // Triangle 1
