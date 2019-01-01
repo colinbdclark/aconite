@@ -9,10 +9,10 @@
             "aconite.dualLayerVideoCompositor"
         ],
 
-        fps: 30,
+        fps: 60,
 
         model: {
-            layerBlend: 0
+            layerBlend: "{blendModulator}.model.value"
         },
 
         uniformModelMap: {
@@ -20,10 +20,6 @@
         },
 
         components: {
-            enviro: {
-                type: "flock.enviro"
-            },
-
             clock: {
                 options: {
                     freq: "{multilayerCompositor}.options.fps"
@@ -43,25 +39,10 @@
             },
 
             blendModulator: {
-                type: "aconite.test.multilayerCompositor.videoBlendModulator",
-                options: {
-                    components: {
-                        enviro: "{multilayerCompositor}.enviro"
-                    }
-                }
+                type: "aconite.test.multilayerCompositor.videoBlendModulator"
             }
         }
     });
-
-
-    aconite.test.multilayerCompositor.updateUniformModelValue = function (that, tofino, modelPath) {
-        // TODO: This doesn't work as a model relay
-        // because of incompatibility between the two requisite
-        // Flocking grade, flock.modelSynth and flock.synth.value.
-        // However this function can and should be factored better!
-        that.value();
-        fluid.set(tofino.model, modelPath, that.model.value);
-    };
 
 
     fluid.defaults("aconite.test.multilayerCompositor.glRenderer", {
@@ -108,7 +89,7 @@
 
 
     fluid.defaults("aconite.test.multilayerCompositor.videoBlendModulator", {
-        gradeNames: ["flock.synth.frameRate"],
+        gradeNames: ["flock.synth.frameRate", "flock.synth.model"],
 
         fps: "{multilayerCompositor}.options.fps",
 
@@ -128,10 +109,7 @@
         },
 
         listeners: {
-            "{clock}.events.onTick": {
-                funcName: "aconite.test.multilayerCompositor.updateUniformModelValue",
-                args: ["{that}", "{multilayerCompositor}", "layerBlend"]
-            }
+            "{clock}.events.onTick": "{that}.generate()"
         }
     });
 })();
