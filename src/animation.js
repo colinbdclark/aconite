@@ -96,8 +96,8 @@
                 type: "aconite.glComponent",
                 container: "{animator}.dom.stage",
                 options: {
-                    events: {
-                        afterShaderProgramCompiled: "{animator}.events.onReady"
+                    listeners: {
+                        "afterShaderProgramCompiled.fireAnimatorOnReady": "{animator}.events.onReady.fire"
                     }
                 }
             }
