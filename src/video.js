@@ -27,7 +27,9 @@
             outTimeSecs: undefined,
 
             // Derived from the video element.
-            totalDuration: undefined
+            totalDuration: undefined,
+
+            canPlayThrough: false
         },
 
         modelRelay: [
@@ -104,6 +106,13 @@
 
             url: [
                 {
+                    namespace: "resetCanPlayThrough",
+                    priority: "before:setSrcAttribute",
+                    changePath: "canPlayThrough",
+                    value: false
+                },
+                {
+                    namespace: "setSrcAttribute",
                     funcName: "aconite.video.setAttribute",
                     args: ["{that}", "src", "{change}.value"]
                 },
@@ -111,6 +120,7 @@
                 // Whenever the video's src changes,
                 // we always need to update the currentTime.
                 {
+                    namespace: "setCurrentTimeAttribute",
                     funcName: "aconite.video.setAttribute",
                     args: ["{that}", "currentTime", "{that}.model.inTimeSecs"]
                 }
@@ -143,6 +153,11 @@
             "onDurationChange.updateTotalDuration": {
                 changePath: "totalDuration",
                 value: "{that}.element.duration"
+            },
+
+            "onVideoLoaded.updateModel": {
+                changePath: "canPlayThrough",
+                value: true
             },
 
             // A hack to work around the fact that Safari
