@@ -113,7 +113,7 @@ var fluid = fluid || require("infusion"),
                             {
                                 funcName: "jqUnit.assertTrue",
                                 args: [
-                                    "The muted attribute should be false.",
+                                    "The muted attribute should be true.",
                                     "{video}.element.muted"
                                 ]
                             }
