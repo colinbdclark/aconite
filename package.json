@@ -26,9 +26,9 @@
         "testem": "2.14.0"
     },
     "dependencies": {
-        "infusion": "3.0.0-dev.20181204T213346Z.2ca90f6e6",
+        "infusion": "3.0.0-dev.20190212T124747Z.23b4bc89d",
         "bergson": "0.14.0",
-        "flocking": "2.0.0-dev.20190101T211732Z.efbf6e2"
+        "flocking": "2.0.0-dev.20190122T010114Z.3b9023d"
     },
     "scripts": {
         "prepare": "node_modules/.bin/grunt",
