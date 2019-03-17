@@ -19,7 +19,8 @@
             frameRate: undefined,
             url: undefined,
             rate: 1.0,
-            muted: true,
+            volume: 0.0,
+            muted: false,
 
             // Derived from parsing in/out/duration times.
             inTimeSecs: undefined,
@@ -89,6 +90,11 @@
             muted: {
                 funcName: "aconite.video.setAttribute",
                 args: ["{that}", "muted", "{change}.value"]
+            },
+
+            volume: {
+                funcName: "aconite.video.setAttribute",
+                args: ["{that}", "volume", "{change}.value"]
             },
 
             // TODO: On Safari, it  appears that this needs to be
@@ -190,7 +196,11 @@
     aconite.video.outTime = function (m) {
         var parsedOutTime = aconite.time.parseTimecode(m.outTime, m.frameRate);
 
-        if (!parsedOutTime || isNaN(parsedOutTime)) {
+        if (isNaN(parsedOutTime)) {
+            parsedOutTime = 0;
+        }
+
+        if (!parsedOutTime) {
             if (m.durationSecs) {
                 // TODO: What if this value is larger than
                 // the video's totalDuration (due to user error)?

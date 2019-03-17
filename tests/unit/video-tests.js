@@ -90,13 +90,13 @@ var fluid = fluid || require("infusion"),
                         ]
                     },
                     {
-                        name: "Muted attribute is set correctly to the default.",
+                        name: "The muted attribute is set correctly to the default.",
                         expect: 1,
                         sequence: [
                             {
-                                funcName: "jqUnit.assertTrue",
+                                funcName: "jqUnit.assertFalse",
                                 args: [
-                                    "The muted attribute should be true.",
+                                    "The muted attribute should be false.",
                                     "{video}.element.muted"
                                 ]
                             }
@@ -108,13 +108,45 @@ var fluid = fluid || require("infusion"),
                         sequence: [
                             {
                                 func: "{video}.applier.change",
-                                args: ["muted", false]
+                                args: ["muted", true]
                             },
                             {
-                                funcName: "jqUnit.assertFalse",
+                                funcName: "jqUnit.assertTrue",
                                 args: [
                                     "The muted attribute should be false.",
                                     "{video}.element.muted"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "The volume attribute is set correctly to the default.",
+                        expect: 1,
+                        sequence: [
+                            {
+                                funcName: "jqUnit.assertEquals",
+                                args: [
+                                    "The volume attribute should be 0.0.",
+                                    0.0,
+                                    "{video}.element.volume"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Volume attribute is updated accordingly.",
+                        expect: 1,
+                        sequence: [
+                            {
+                                func: "{video}.applier.change",
+                                args: ["volume", 0.5]
+                            },
+                            {
+                                funcName: "jqUnit.assertEquals",
+                                args: [
+                                    "The volume attribute should be false.",
+                                    0.5,
+                                    "{video}.element.volume"
                                 ]
                             }
                         ]
