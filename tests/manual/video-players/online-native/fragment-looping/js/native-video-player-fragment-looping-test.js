@@ -7,7 +7,7 @@
         model: {
             loop: true,
             inTime: 5,
-            outTime: 7
+            outTime: "00:00:06:29"
         }
     });
 })();
