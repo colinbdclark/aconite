@@ -1,6 +1,6 @@
 {
     "name": "aconite",
-    "version": "0.11.0",
+    "version": "0.11.1",
     "description": "A framework for creative video and image processing on the web.",
     "author": "Colin Clark",
     "repository": {
@@ -17,18 +17,18 @@
     "readmeFilename": "README.md",
     "devDependencies": {
         "fluid-grunt-eslint": "18.1.2",
-        "grunt": "1.0.3",
+        "grunt": "1.0.4",
         "grunt-contrib-clean": "2.0.0",
         "grunt-contrib-concat": "1.0.1",
         "grunt-contrib-copy": "1.0.0",
-        "grunt-contrib-uglify": "4.0.0",
-        "jquery": "3.3.1",
-        "testem": "2.14.0"
+        "grunt-contrib-uglify": "4.0.1",
+        "jquery": "3.4.1",
+        "testem": "2.15.1"
     },
     "dependencies": {
-        "infusion": "3.0.0-dev.20190212T124747Z.23b4bc89d",
+        "infusion": "3.0.0-dev.20190328T144119Z.ec44dbfab",
         "bergson": "0.14.0",
-        "flocking": "2.0.0-dev.20190122T010114Z.3b9023d"
+        "flocking": "2.0.1"
     },
     "scripts": {
         "prepare": "node_modules/.bin/grunt",
