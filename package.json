@@ -1,37 +1,41 @@
 {
-    "name": "aconite",
-    "version": "0.11.1",
-    "description": "A framework for creative video and image processing on the web.",
-    "author": "Colin Clark",
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/colinbdclark/aconite.git"
-    },
-    "bugs": "http://github.com/colinbdclark/aconite/issues",
-    "license": "MIT",
-    "keywords": [
-        "video",
-        "compositing",
-        "webgl"
-    ],
-    "readmeFilename": "README.md",
-    "devDependencies": {
-        "fluid-grunt-eslint": "18.1.2",
-        "grunt": "1.0.4",
-        "grunt-contrib-clean": "2.0.0",
-        "grunt-contrib-concat": "1.0.1",
-        "grunt-contrib-copy": "1.0.0",
-        "grunt-contrib-uglify": "4.0.1",
-        "jquery": "3.4.1",
-        "testem": "2.15.1"
-    },
-    "dependencies": {
-        "infusion": "3.0.0-dev.20190328T144119Z.ec44dbfab",
-        "bergson": "0.14.0",
-        "flocking": "2.0.1"
-    },
-    "scripts": {
-        "prepare": "node_modules/.bin/grunt",
-        "test": "node_modules/.bin/testem ci --file tests/unit/testem.json"
-    }
+  "name": "aconite",
+  "version": "0.11.1",
+  "description": "A framework for creative video and image processing on the web.",
+  "author": "Colin Clark",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/colinbdclark/aconite.git"
+  },
+  "bugs": "http://github.com/colinbdclark/aconite/issues",
+  "license": "MIT",
+  "keywords": [
+    "video",
+    "compositing",
+    "webgl"
+  ],
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "fluid-grunt-eslint": "18.1.2",
+    "grunt": "1.0.4",
+    "grunt-contrib-clean": "2.0.0",
+    "grunt-contrib-concat": "1.0.1",
+    "grunt-contrib-copy": "1.0.0",
+    "grunt-contrib-uglify": "4.0.1",
+    "jquery": "3.4.1",
+    "testem": "2.15.1"
+  },
+  "dependencies": {
+    "infusion": "3.0.0-dev.20190328T144119Z.ec44dbfab",
+    "bergson": "0.14.0",
+    "flocking": "2.0.1",
+    "snyk": "^1.192.4"
+  },
+  "scripts": {
+    "prepare": "node_modules/.bin/grunt",
+    "test": "node_modules/.bin/testem ci --file tests/unit/testem.json",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
