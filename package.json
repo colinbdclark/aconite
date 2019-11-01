@@ -1,6 +1,6 @@
 {
     "name": "aconite",
-    "version": "0.11.1",
+    "version": "0.11.2",
     "description": "A framework for creative video and image processing on the web.",
     "author": "Colin Clark",
     "repository": {
@@ -23,10 +23,10 @@
         "grunt-contrib-copy": "1.0.0",
         "grunt-contrib-uglify": "4.0.1",
         "jquery": "3.4.1",
-        "testem": "2.15.1"
+        "testem": "3.0.0"
     },
     "dependencies": {
-        "infusion": "3.0.0-dev.20190328T144119Z.ec44dbfab",
+        "infusion": "3.0.0-dev.20190905T163833Z.b024bff87",
         "bergson": "0.14.0",
         "flocking": "2.0.1"
     },
